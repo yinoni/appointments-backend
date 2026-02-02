@@ -1,0 +1,23 @@
+services:
+  # בסיס הנתונים Postgres
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: appointments_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # שכבת ה-Cache והנעילות Redis
+  redis-cache:
+    image: redis:7-alpine
+    container_name: redis_container
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
