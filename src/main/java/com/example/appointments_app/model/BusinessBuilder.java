@@ -1,14 +1,12 @@
 package com.example.appointments_app.model;
 
 import java.util.List;
-import java.util.Set;
 
 public final class BusinessBuilder {
     private Long id;
     private String businessName;
     private User owner;
     private Integer totalAppointments;
-    private Set<Appointment> availableAppointments;
     private List<Service> services;
 
     private BusinessBuilder() {
@@ -38,11 +36,6 @@ public final class BusinessBuilder {
         return this;
     }
 
-    public BusinessBuilder withAvailableAppointments(Set<Appointment> availableAppointments) {
-        this.availableAppointments = availableAppointments;
-        return this;
-    }
-
     public BusinessBuilder withServices(List<Service> services) {
         this.services = services;
         return this;
@@ -54,7 +47,6 @@ public final class BusinessBuilder {
         business.setBusinessName(businessName);
         business.setOwner(owner);
         business.setTotalAppointments(totalAppointments);
-        business.setAvailableAppointments(availableAppointments);
         business.setServices(services);
         return business;
     }

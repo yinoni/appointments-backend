@@ -7,7 +7,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 public interface AppointmentRepo extends CrudRepository<Appointment, Long> {
+
     @Modifying
     @Transactional
     @Query("UPDATE Appointment a SET a.service = null WHERE a.service.id = :serviceId")

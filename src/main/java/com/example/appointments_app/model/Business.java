@@ -25,11 +25,12 @@ public class Business {
 
     private Integer totalAppointments;
 
-    @OneToMany
-    private Set<Appointment> availableAppointments;
-
     @OneToMany(mappedBy = "business", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Service> services;
+
+    @OneToMany(mappedBy = "business", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Schedule> schedules;
+
 
     public Business() {
     }
@@ -66,13 +67,6 @@ public class Business {
         this.totalAppointments = totalAppointments;
     }
 
-    public Set<Appointment> getAvailableAppointments() {
-        return availableAppointments;
-    }
-
-    public void setAvailableAppointments(Set<Appointment> availableAppointments) {
-        this.availableAppointments = availableAppointments;
-    }
 
     public List<Service> getServices() {
         return services;
@@ -82,20 +76,29 @@ public class Business {
         this.services = services;
     }
 
+    public void increaseTotalAppointments() {
+        this.totalAppointments += 1;
+    }
+
+    public List<Schedule> getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
+    }
+
     public BusinessDTO convertToDTO(){
         BusinessDTO dto = new BusinessDTO();
-        List<ServiceDTO> services = new ArrayList<>();
-        Set<AppointmentDTO> availableAppointments = new HashSet<>();
+        List<ServiceDTO> services = this.services.stream().map(Service::convertToDTO).toList();
+        List<ScheduleDTO> schedules = this.schedules.stream().map(Schedule::convertToDTO).toList();
+
         dto.setId(this.id);
         dto.setBusinessName(this.businessName);
         dto.setOwner(this.owner.convertToUserDTO());
         dto.setTotalAppointments(this.totalAppointments);
-
-        services = this.services.stream().map(Service::convertToDTO).toList();
-        availableAppointments = this.availableAppointments.stream().map(Appointment::convertToDTO).collect(Collectors.toSet());
-
-        dto.setAvailableAppointments(availableAppointments);
         dto.setServices(services);
+        dto.setSchedules(schedules);
 
         return dto;
     }

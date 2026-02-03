@@ -6,6 +6,7 @@ public class AppointmentDTO {
     private Long id;
     private LocalDateTime time;
     private ServiceDTO service;
+    private UserDTO user;
 
     public AppointmentDTO(){}
 
@@ -32,5 +33,13 @@ public class AppointmentDTO {
 
     public void setService(ServiceDTO service) {
         this.service = service;
+    }
+
+    public UserDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserDTO user) {
+        this.user = user;
     }
 }

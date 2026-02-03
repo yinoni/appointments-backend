@@ -49,5 +49,11 @@ public class BusinessController {
         return ResponseEntity.ok(dto);
     }
 
+    @GetMapping("/{businessId}/schedules")
+    public ResponseEntity<?> getSchedules(@PathVariable Long businessId){
+        List<ScheduleDTO> dtos = businessService.findAllBusinessSchedules(businessId);
+
+        return ResponseEntity.ok(dtos);
+    }
 
 }

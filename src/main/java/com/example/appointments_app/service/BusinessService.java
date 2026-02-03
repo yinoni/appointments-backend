@@ -5,6 +5,7 @@ import com.example.appointments_app.exception.BusinessException;
 import com.example.appointments_app.exception.ServiceNotFoundException;
 import com.example.appointments_app.exception.UserNotFoundException;
 import com.example.appointments_app.model.*;
+import com.example.appointments_app.repo.AppointmentRepo;
 import com.example.appointments_app.repo.BusinessRepo;
 import com.example.appointments_app.repo.UserRepository;
 import jakarta.transaction.Transactional;
@@ -15,30 +16,39 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static com.example.appointments_app.model.AppointmentBuilder.anAppointment;
 
 @Service
 public class BusinessService {
 
     private final BusinessRepo businessRepo;
-    private final UserRepository userRepository;
     private final ServiceService serviceService;
     private final AppointmentService appointmentService;
+    private final UserService userService;
+    private final ScheduleService scheduleService;
 
-    public BusinessService(BusinessRepo businessRepo, UserRepository userRepository, ServiceService serviceService, AppointmentService appointmentService){
+    public BusinessService(BusinessRepo businessRepo,
+                           UserRepository userRepository,
+                           ServiceService serviceService,
+                           AppointmentService appointmentService,
+                           UserService userService,
+                           ScheduleService scheduleService){
         this.businessRepo = businessRepo;
-        this.userRepository = userRepository;
         this.serviceService = serviceService;
         this.appointmentService = appointmentService;
+        this.userService = userService;
+        this.scheduleService = scheduleService;
     }
 
     public BusinessDTO createBusiness(BusinessInput businessInput, Long ownerId){
-        User user = userRepository.findById(ownerId).orElseThrow(() ->
-                new UserNotFoundException("User not found!", HttpStatus.NOT_FOUND));
+        User user = userService.findById(ownerId);
 
         Business business = businessInput.toBusiness();
         business.setOwner(user);
         business.setTotalAppointments(0);
-        business.setAvailableAppointments(new HashSet<>());
+        business.setSchedules(new ArrayList<>());
         business.setServices(new ArrayList<>());
         try{
             return businessRepo.save(business).convertToDTO();
@@ -65,28 +75,21 @@ public class BusinessService {
     }
 
     public BusinessDTO deleteBusiness(Long businessId, Long userId){
-        try{
-            Business business = businessRepo.findById(businessId).orElseThrow(() ->
-                    new BusinessException("Business not found!", HttpStatus.NOT_FOUND));
+        Business business = businessRepo.findById(businessId).orElseThrow(() ->
+                new BusinessException("Business not found!", HttpStatus.NOT_FOUND));
 
-            BusinessDTO bDTO;
+        BusinessDTO bDTO;
 
-            if(!Objects.equals(business.getOwner().getId(), userId))
-                throw new BusinessException("User not allowed to delete this business!", HttpStatus.FORBIDDEN);
+        if(!Objects.equals(business.getOwner().getId(), userId))
+            throw new BusinessException("User not allowed to delete this business!", HttpStatus.FORBIDDEN);
 
-            appointmentService.deleteAllAppointmentsByBusinessId(businessId);
+        appointmentService.deleteAllAppointmentsByBusinessId(businessId);
 
-            bDTO = business.convertToDTO();
+        bDTO = business.convertToDTO();
 
-            businessRepo.deleteById(businessId);
+        businessRepo.deleteById(businessId);
 
-            return bDTO;
-        }
-        catch(Exception e){
-            System.out.println(e.getMessage());
-            return null;
-        }
-
+        return bDTO;
     }
 
     public BusinessDTO addNewService(ServiceIn serviceIn, Long ownerId){
@@ -98,8 +101,7 @@ public class BusinessService {
 
         service = serviceService.addNewService(service);
 
-        if(!business.getServices().add(service))
-            throw new BusinessException("Service not added!", HttpStatus.NOT_MODIFIED);
+        business.getServices().add(service);
 
         businessRepo.save(business);
 
@@ -123,4 +125,14 @@ public class BusinessService {
         // 3. שמירת העסק - בזכות orphanRemoval=true, ה-Service יימחק מה-DB אוטומטית!
         return businessRepo.save(business).convertToDTO();
     }
+
+    public List<ScheduleDTO> findAllBusinessSchedules(Long businessId){
+        Business business = businessRepo.findById(businessId).orElseThrow(() ->
+                new BusinessException("Business not found!", HttpStatus.NOT_FOUND));
+
+        List<Schedule> schedules = scheduleService.getSchedulesByBusinessId(businessId);
+
+        return  schedules.stream().map(Schedule::convertToDTO).toList();
+    }
+
 }

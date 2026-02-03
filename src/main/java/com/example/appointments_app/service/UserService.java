@@ -27,6 +27,14 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public User findById(Long id){
+        return userRepository.findById(id).orElseThrow(()->new UsernameNotFoundException("User not found"));
+    }
+
+    public User findByPhone(String phone){
+        return userRepository.findUserByPhoneNumber(phone).orElseThrow(()->new UsernameNotFoundException("User not found"));
+    }
+
 
     public User register(UserIn userIn){
         try{

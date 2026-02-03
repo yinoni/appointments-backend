@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 public final class AppointmentBuilder {
     private Long id;
     private LocalDateTime time;
-    private Business business;
     private Service service;
     private User user;
     private String status;
@@ -24,11 +23,6 @@ public final class AppointmentBuilder {
 
     public AppointmentBuilder withTime(LocalDateTime time) {
         this.time = time;
-        return this;
-    }
-
-    public AppointmentBuilder withBusiness(Business business) {
-        this.business = business;
         return this;
     }
 
@@ -51,7 +45,6 @@ public final class AppointmentBuilder {
         Appointment appointment = new Appointment();
         appointment.setId(id);
         appointment.setTime(time);
-        appointment.setBusiness(business);
         appointment.setService(service);
         appointment.setUser(user);
         appointment.setStatus(status);

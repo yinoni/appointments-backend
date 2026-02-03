@@ -1,8 +1,11 @@
 package com.example.appointments_app.service;
 
 import com.example.appointments_app.exception.ServiceNotFoundException;
+import com.example.appointments_app.model.Appointment;
 import com.example.appointments_app.repo.AppointmentRepo;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AppointmentService {
@@ -11,6 +14,10 @@ public class AppointmentService {
 
     public AppointmentService(AppointmentRepo appointmentRepo){
         this.appointmentRepo = appointmentRepo;
+    }
+
+    public Appointment insertAppointment(Appointment app) {
+        return appointmentRepo.save(app);
     }
 
     public void deleteAllAppointmentsByBusinessId(Long businessId){
@@ -25,4 +32,6 @@ public class AppointmentService {
 
         appointmentRepo.deleteAppointmentByServiceId(serviceId);
     }
+
+
 }

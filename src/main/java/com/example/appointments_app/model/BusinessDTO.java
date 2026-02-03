@@ -8,20 +8,11 @@ public class BusinessDTO {
     private String businessName;
     private UserDTO owner;
     private Integer totalAppointments;
-    private Set<AppointmentDTO> availableAppointments;
     private List<ServiceDTO> services;
+    private List<ScheduleDTO> schedules;
 
 
     public BusinessDTO(){}
-
-    public BusinessDTO(Long id, String businessName, UserDTO owner, Integer totalAppointments, Set<AppointmentDTO> availableAppointments, List<ServiceDTO> services) {
-        this.id = id;
-        this.businessName = businessName;
-        this.owner = owner;
-        this.totalAppointments = totalAppointments;
-        this.availableAppointments = availableAppointments;
-        this.services = services;
-    }
 
     public Long getId() {
         return id;
@@ -55,13 +46,6 @@ public class BusinessDTO {
         this.totalAppointments = totalAppointments;
     }
 
-    public Set<AppointmentDTO> getAvailableAppointments() {
-        return availableAppointments;
-    }
-
-    public void setAvailableAppointments(Set<AppointmentDTO> availableAppointments) {
-        this.availableAppointments = availableAppointments;
-    }
 
     public List<ServiceDTO> getServices() {
         return services;
@@ -69,5 +53,13 @@ public class BusinessDTO {
 
     public void setServices(List<ServiceDTO> services) {
         this.services = services;
+    }
+
+    public List<ScheduleDTO> getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(List<ScheduleDTO> schedules) {
+        this.schedules = schedules;
     }
 }
