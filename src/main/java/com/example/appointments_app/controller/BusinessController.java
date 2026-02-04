@@ -2,6 +2,7 @@ package com.example.appointments_app.controller;
 
 import com.example.appointments_app.model.*;
 import com.example.appointments_app.service.BusinessService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,14 +39,20 @@ public class BusinessController {
     }
 
     @PostMapping("/addService")
-    public ResponseEntity<?> addService(@RequestBody ServiceIn serviceIn , @AuthenticationPrincipal CustomUserDetails currentUser){
+    public ResponseEntity<?> addService(@Valid @RequestBody ServiceIn serviceIn , @AuthenticationPrincipal CustomUserDetails currentUser){
         BusinessDTO dto = businessService.addNewService(serviceIn, currentUser.getId());
         return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/removeService")
-    public ResponseEntity<?> removeService(@RequestBody ServiceRemoveRequest request, @AuthenticationPrincipal CustomUserDetails currentUser){
+    public ResponseEntity<?> removeService(@Valid @RequestBody ServiceRemoveRequest request, @AuthenticationPrincipal CustomUserDetails currentUser){
         BusinessDTO dto = businessService.removeService(request, currentUser.getId());
+        return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/{businessId}/schedule")
+    public ResponseEntity<?> addSchedule(@PathVariable Long businessId, @AuthenticationPrincipal CustomUserDetails currentUser, @Valid @RequestBody ScheduleIn scheduleIn){
+        ScheduleDTO dto = businessService.addNewSchedule(businessId, scheduleIn, currentUser.getId());
         return ResponseEntity.ok(dto);
     }
 

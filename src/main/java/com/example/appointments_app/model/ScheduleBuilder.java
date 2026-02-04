@@ -1,6 +1,7 @@
 package com.example.appointments_app.model;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public final class ScheduleBuilder {
@@ -8,6 +9,10 @@ public final class ScheduleBuilder {
     private LocalDate date;
     private Business business;
     private List<Appointment> appointments;
+    private Integer min_duration;
+    private LocalTime start_time;
+    private LocalTime end_time;
+    private List<LocalTime> available_hours;
 
     private ScheduleBuilder() {
     }
@@ -36,12 +41,36 @@ public final class ScheduleBuilder {
         return this;
     }
 
+    public ScheduleBuilder withMin_duration(Integer min_duration) {
+        this.min_duration = min_duration;
+        return this;
+    }
+
+    public ScheduleBuilder withStart_time(LocalTime start_time) {
+        this.start_time = start_time;
+        return this;
+    }
+
+    public ScheduleBuilder withEnd_time(LocalTime end_time) {
+        this.end_time = end_time;
+        return this;
+    }
+
+    public ScheduleBuilder withAvailable_hours(List<LocalTime> available_hours) {
+        this.available_hours = available_hours;
+        return this;
+    }
+
     public Schedule build() {
         Schedule schedule = new Schedule();
         schedule.setId(id);
         schedule.setDate(date);
         schedule.setBusiness(business);
         schedule.setAppointments(appointments);
+        schedule.setMin_duration(min_duration);
+        schedule.setStart_time(start_time);
+        schedule.setEnd_time(end_time);
+        schedule.setAvailable_hours(available_hours);
         return schedule;
     }
 }

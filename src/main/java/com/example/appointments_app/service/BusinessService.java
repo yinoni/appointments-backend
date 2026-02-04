@@ -1,10 +1,8 @@
 package com.example.appointments_app.service;
 
-import com.example.appointments_app.exception.BusinessCreationException;
-import com.example.appointments_app.exception.BusinessException;
-import com.example.appointments_app.exception.ServiceNotFoundException;
-import com.example.appointments_app.exception.UserNotFoundException;
+import com.example.appointments_app.exception.*;
 import com.example.appointments_app.model.*;
+import com.example.appointments_app.redis.Redis;
 import com.example.appointments_app.repo.AppointmentRepo;
 import com.example.appointments_app.repo.BusinessRepo;
 import com.example.appointments_app.repo.UserRepository;
@@ -12,6 +10,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.DateTimeException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,18 +27,21 @@ public class BusinessService {
     private final AppointmentService appointmentService;
     private final UserService userService;
     private final ScheduleService scheduleService;
+    private final Redis redis;
 
     public BusinessService(BusinessRepo businessRepo,
                            UserRepository userRepository,
                            ServiceService serviceService,
                            AppointmentService appointmentService,
                            UserService userService,
-                           ScheduleService scheduleService){
+                           ScheduleService scheduleService,
+                           Redis redis){
         this.businessRepo = businessRepo;
         this.serviceService = serviceService;
         this.appointmentService = appointmentService;
         this.userService = userService;
         this.scheduleService = scheduleService;
+        this.redis = redis;
     }
 
     public BusinessDTO createBusiness(BusinessInput businessInput, Long ownerId){
@@ -126,8 +128,24 @@ public class BusinessService {
         return businessRepo.save(business).convertToDTO();
     }
 
+    public ScheduleDTO addNewSchedule(Long businessId, ScheduleIn scheduleIn, Long ownerId){
+
+        Business business = findBusinessByIdAndOwnerId(businessId, ownerId);
+        Schedule schedule = scheduleIn.toSchedule();
+
+        schedule.setBusiness(business);
+        schedule.setAppointments(new ArrayList<>());
+
+        schedule = scheduleService.addNewSchedule(schedule);
+
+        String key = business.getId() + ":" + schedule.getId() + ":" + schedule.getDate();
+        redis.setOffsetsPipelined(key, schedule.getAvailable_hours(), schedule.getMin_duration());
+
+        return  schedule.convertToDTO();
+    }
+
     public List<ScheduleDTO> findAllBusinessSchedules(Long businessId){
-        Business business = businessRepo.findById(businessId).orElseThrow(() ->
+        businessRepo.findById(businessId).orElseThrow(() ->
                 new BusinessException("Business not found!", HttpStatus.NOT_FOUND));
 
         List<Schedule> schedules = scheduleService.getSchedulesByBusinessId(businessId);

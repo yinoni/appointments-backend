@@ -1,13 +1,15 @@
 package com.example.appointments_app.model;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public class ScheduleDTO {
     private Long id;
     private LocalDate date;
-    private BusinessDTO business;
+    private Long business;
     private List<AppointmentDTO> appointments;
+    private List<LocalTime> available_hours;
 
     public ScheduleDTO() {
     }
@@ -28,11 +30,11 @@ public class ScheduleDTO {
         this.date = date;
     }
 
-    public BusinessDTO getBusiness() {
+    public Long getBusiness() {
         return business;
     }
 
-    public void setBusiness(BusinessDTO business) {
+    public void setBusiness(Long business) {
         this.business = business;
     }
 
@@ -42,5 +44,13 @@ public class ScheduleDTO {
 
     public void setAppointments(List<AppointmentDTO> appointments) {
         this.appointments = appointments;
+    }
+
+    public List<LocalTime> getAvailable_hours() {
+        return available_hours;
+    }
+
+    public void setAvailable_hours(List<LocalTime> available_hours) {
+        this.available_hours = available_hours;
     }
 }
