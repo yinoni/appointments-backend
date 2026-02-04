@@ -153,4 +153,14 @@ public class BusinessService {
         return  schedules.stream().map(Schedule::convertToDTO).toList();
     }
 
+    public void deleteSchedule(Long businessId, Long scheduleId, Long ownerId){
+        findBusinessByIdAndOwnerId(businessId, ownerId);
+        Schedule schedule = scheduleService.findById(scheduleId);
+
+        if(!Objects.equals(schedule.getBusiness().getId(), businessId))
+            throw new BusinessException("The business not contains this schedule!", HttpStatus.BAD_GATEWAY);
+
+        scheduleService.deleteById(scheduleId);
+    }
+
 }

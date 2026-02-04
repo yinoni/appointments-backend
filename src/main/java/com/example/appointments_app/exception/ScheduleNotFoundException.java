@@ -2,9 +2,9 @@ package com.example.appointments_app.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class ServiceNotFoundException extends BaseException {
+public class ScheduleNotFoundException extends BaseException {
 
-    public ServiceNotFoundException(String message) {
+    public ScheduleNotFoundException(String message) {
         super(message, HttpStatus.NOT_FOUND);
     }
 

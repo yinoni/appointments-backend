@@ -56,11 +56,17 @@ public class BusinessController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/{businessId}/schedules")
+    @GetMapping("/{businessId}/schedule")
     public ResponseEntity<?> getSchedules(@PathVariable Long businessId){
         List<ScheduleDTO> dtos = businessService.findAllBusinessSchedules(businessId);
 
         return ResponseEntity.ok(dtos);
+    }
+
+    @DeleteMapping("/{businessId}/schedule/{scheduleId}")
+    public ResponseEntity<?> deleteSchedule(@PathVariable Long businessId, @PathVariable Long scheduleId, @AuthenticationPrincipal CustomUserDetails currentUser){
+        businessService.deleteSchedule(businessId, scheduleId, currentUser.getId());
+        return ResponseEntity.ok("The schedule has been deleted");
     }
 
 }
