@@ -2,13 +2,18 @@ package com.example.appointments_app.controller;
 
 import com.example.appointments_app.model.*;
 import com.example.appointments_app.service.BusinessService;
+import com.example.appointments_app.util.DateUtils;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+
+import static com.example.appointments_app.util.DateUtils.getDateLocalDate;
 
 @RestController
 @RequestMapping("/business")
@@ -67,6 +72,13 @@ public class BusinessController {
     public ResponseEntity<?> deleteSchedule(@PathVariable Long businessId, @PathVariable Long scheduleId, @AuthenticationPrincipal CustomUserDetails currentUser){
         businessService.deleteSchedule(businessId, scheduleId, currentUser.getId());
         return ResponseEntity.ok("The schedule has been deleted");
+    }
+
+    @GetMapping("/{businessId}/schedule/byDate")
+    public ResponseEntity<?> getScheduleByDate(@PathVariable Long businessId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
+        ScheduleDTO scheduleDTO = businessService.findScheduleByDateAndBusiness(businessId, date).convertToDTO();
+
+        return ResponseEntity.ok(scheduleDTO);
     }
 
 }

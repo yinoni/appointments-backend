@@ -11,10 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.DateTimeException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.example.appointments_app.model.AppointmentBuilder.anAppointment;
@@ -27,7 +25,7 @@ public class BusinessService {
     private final AppointmentService appointmentService;
     private final UserService userService;
     private final ScheduleService scheduleService;
-    private final Redis redis;
+
 
     public BusinessService(BusinessRepo businessRepo,
                            UserRepository userRepository,
@@ -41,7 +39,11 @@ public class BusinessService {
         this.appointmentService = appointmentService;
         this.userService = userService;
         this.scheduleService = scheduleService;
-        this.redis = redis;
+    }
+
+    public Business findBusinessById(Long b_id){
+        return businessRepo.findById(b_id).orElseThrow(() ->
+                new BusinessException("Business not found!", HttpStatus.NOT_FOUND));
     }
 
     public BusinessDTO createBusiness(BusinessInput businessInput, Long ownerId){
@@ -138,9 +140,6 @@ public class BusinessService {
 
         schedule = scheduleService.addNewSchedule(schedule);
 
-        String key = business.getId() + ":" + schedule.getId() + ":" + schedule.getDate();
-        redis.setOffsetsPipelined(key, schedule.getAvailable_hours(), schedule.getMin_duration());
-
         return  schedule.convertToDTO();
     }
 
@@ -163,4 +162,8 @@ public class BusinessService {
         scheduleService.deleteById(scheduleId);
     }
 
+    public Schedule findScheduleByDateAndBusiness(Long businessId, LocalDate date) {
+        findBusinessById(businessId);
+        return scheduleService.getScheduleByDate(businessId, date);
+    }
 }

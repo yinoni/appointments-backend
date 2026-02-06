@@ -15,6 +15,9 @@ import java.util.List;
                         name = "business_date", // שם האילוץ (לבחירתך)
                         columnNames = {"business_id", "date"} // העמודות שחייבות להיות ייחודיות יחד
                 )
+        },
+        indexes = {
+                @Index(name = "idx_business_date", columnList = "business_id, date", unique = true)
         })
 public class Schedule {
 

@@ -17,7 +17,6 @@ import static com.example.appointments_app.model.ScheduleBuilder.aSchedule;
 public class ScheduleIn {
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-
     private LocalDate date;
 
     @Min(1)
@@ -91,6 +90,7 @@ public class ScheduleIn {
                 available_hours.add(LocalTime.of(i, j));
             }
         }
+        available_hours.add(LocalTime.of(this.endTime, 0));
         return available_hours;
     }
 
