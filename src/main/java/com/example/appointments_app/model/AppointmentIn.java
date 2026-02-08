@@ -1,12 +1,20 @@
 package com.example.appointments_app.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 import static com.example.appointments_app.model.AppointmentBuilder.anAppointment;
 
 public class AppointmentIn {
     private Long serviceId;
-    private String time;
+    @JsonFormat(pattern = "HH:mm")
+    LocalTime time;
     private String fullName;
     private String phone;
+    private Long scheduleId;
 
     public AppointmentIn() {
     }
@@ -19,11 +27,11 @@ public class AppointmentIn {
         this.serviceId = serviceId;
     }
 
-    public String getTime() {
+    public LocalTime getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(LocalTime time) {
         this.time = time;
     }
 
@@ -43,5 +51,18 @@ public class AppointmentIn {
         this.phone = phone;
     }
 
+    public Long getScheduleId() {
+        return scheduleId;
+    }
 
+    public void setScheduleId(Long scheduleId) {
+        this.scheduleId = scheduleId;
+    }
+
+    public Appointment toAppointment(){
+        return anAppointment()
+                .withStatus("ACCEPTED")
+                .withTime(time)
+                .build();
+    }
 }

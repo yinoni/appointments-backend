@@ -1,13 +1,14 @@
 package com.example.appointments_app.model;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public final class AppointmentBuilder {
     private Long id;
-    private LocalDateTime time;
+    private LocalTime time;
     private Service service;
     private User user;
     private String status;
+    private Schedule schedule;
 
     private AppointmentBuilder() {
     }
@@ -21,7 +22,7 @@ public final class AppointmentBuilder {
         return this;
     }
 
-    public AppointmentBuilder withTime(LocalDateTime time) {
+    public AppointmentBuilder withTime(LocalTime time) {
         this.time = time;
         return this;
     }
@@ -41,6 +42,11 @@ public final class AppointmentBuilder {
         return this;
     }
 
+    public AppointmentBuilder withSchedule(Schedule schedule) {
+        this.schedule = schedule;
+        return this;
+    }
+
     public Appointment build() {
         Appointment appointment = new Appointment();
         appointment.setId(id);
@@ -48,6 +54,7 @@ public final class AppointmentBuilder {
         appointment.setService(service);
         appointment.setUser(user);
         appointment.setStatus(status);
+        appointment.setSchedule(schedule);
         return appointment;
     }
 }

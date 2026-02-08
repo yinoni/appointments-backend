@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.ManyToAny;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 
 @Entity
@@ -14,7 +15,7 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime time;
+    private LocalTime time;
 
     @ManyToOne
     @JoinColumn(name="service_id")
@@ -74,11 +75,11 @@ public class Appointment {
     }
 
 
-    public LocalDateTime getTime() {
+    public LocalTime getTime() {
         return time;
     }
 
-    public void setTime(LocalDateTime time) {
+    public void setTime(LocalTime time) {
         this.time = time;
     }
 

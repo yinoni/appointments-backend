@@ -39,7 +39,6 @@ public class Schedule {
     @Min(5)
     private Integer min_duration;
 
-
     @Column(nullable = false)
     private LocalTime start_time;
 

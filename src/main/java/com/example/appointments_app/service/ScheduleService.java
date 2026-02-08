@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -47,6 +48,11 @@ public class ScheduleService {
     public Schedule getScheduleByDate(Long businessId, LocalDate date){
         return scheduleRepo.findScheduleByDateAndBusiness(businessId, date).orElseThrow(() ->
                 new ScheduleNotFoundException(("The schedule not found!")));
+    }
+
+    public boolean tryToLockSlot(Schedule schedule, LocalTime time, int serviceDuration){
+        String key = schedule.getBusiness().getId() + ":" + schedule.getId() + ":" + schedule.getDate();
+        return redis.tryToLockSlot(key, time, schedule.getMin_duration(), serviceDuration);
     }
 
     public List<Schedule> getSchedulesByBusinessId(Long b_id) {
