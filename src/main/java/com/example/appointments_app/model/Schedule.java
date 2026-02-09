@@ -123,7 +123,7 @@ public class Schedule {
         scheduleDTO.setId(id);
         scheduleDTO.setDate(date);
         scheduleDTO.setBusiness(business.getId());
-        scheduleDTO.setAppointments(appointments.stream().map(Appointment::convertToDTO).toList());
+        //scheduleDTO.setAppointments(appointments.stream().map(Appointment::convertToDTO).toList());
         scheduleDTO.setAvailable_hours(available_hours);
 
         return scheduleDTO;

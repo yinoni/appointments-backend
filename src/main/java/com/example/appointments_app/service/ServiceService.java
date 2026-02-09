@@ -1,10 +1,15 @@
 package com.example.appointments_app.service;
 
 import com.example.appointments_app.exception.ServiceNotFoundException;
+import com.example.appointments_app.model.Appointment;
+import com.example.appointments_app.model.Schedule;
 import com.example.appointments_app.model.ServiceDTO;
 import com.example.appointments_app.model.ServiceIn;
 import com.example.appointments_app.repo.ServiceRepo;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalTime;
+import java.util.List;
 
 @Service
 public class ServiceService {

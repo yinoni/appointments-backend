@@ -43,25 +43,9 @@ public class Redis {
      *
      * @param key - The key as string
      * @param hour - The hour that we need to check if it is taken or not
-     * @param dayDivide - The divider of the day
-     * @return - True if the hour is taken and false if it available
-
-    public boolean tryToLockSlot(String key, LocalTime hour, int dayDivide) {
-        long offset = getOffset(dayDivide, hour);
-
-        Boolean wasAlreadyTaken = redisTemplate.opsForValue().setBit(key, offset, true);
-
-        return Boolean.TRUE.equals(wasAlreadyTaken);
-    }
-    ]*/
-
-    /***
-     *
-     * @param key - The key as string
-     * @param hour - The hour that we need to check if it is taken or not
      * @param day_divide - The divider of the day
      * @param duration
-     * @return - True if the hours is taken and false if all the hours slots are available
+     * @return - It tries to set the hours as taken and if the hours is already taken it returns false
      */
     public boolean tryToLockSlot(String key, LocalTime hour, int day_divide, int duration){
         long startOffset = getOffset(day_divide, hour);

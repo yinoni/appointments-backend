@@ -6,6 +6,7 @@ import com.example.appointments_app.redis.Redis;
 import com.example.appointments_app.repo.AppointmentRepo;
 import com.example.appointments_app.repo.BusinessRepo;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -189,11 +190,12 @@ public class BusinessService {
      * @param businessId - The business id
      * @return - All list of all the business schedules
      */
-    public List<ScheduleDTO> findAllBusinessSchedules(Long businessId){
+    public List<ScheduleDTO> findAllBusinessSchedules(Long businessId, int pageNumber, int size){
         businessRepo.findById(businessId).orElseThrow(() ->
                 new BusinessException("Business not found!", HttpStatus.NOT_FOUND));
 
-        List<Schedule> schedules = scheduleService.getSchedulesByBusinessId(businessId);
+        Page<Schedule> page = scheduleService.getSchedulesByBusinessId(businessId, pageNumber, size);
+        List<Schedule> schedules = page.stream().toList();
 
         return  schedules.stream().map(Schedule::convertToDTO).toList();
     }

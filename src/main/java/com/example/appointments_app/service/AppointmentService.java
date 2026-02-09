@@ -6,6 +6,7 @@ import com.example.appointments_app.model.*;
 import com.example.appointments_app.repo.AppointmentRepo;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -38,6 +39,8 @@ public class AppointmentService {
 
         if(!scheduleService.tryToLockSlot(schedule, appointmentIn.getTime(), service.getDuration()))
             throw new AppointmentAlreadyExistsException("The appointment is taken!");
+
+        scheduleService.pullAvailableHours(schedule, app.getTime(), service.getDuration()/schedule.getMin_duration());
 
         return appointmentRepo.save(app);
     }

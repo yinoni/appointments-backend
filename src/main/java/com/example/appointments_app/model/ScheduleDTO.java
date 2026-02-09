@@ -8,7 +8,6 @@ public class ScheduleDTO {
     private Long id;
     private LocalDate date;
     private Long business;
-    private List<AppointmentDTO> appointments;
     private List<LocalTime> available_hours;
 
     public ScheduleDTO() {
@@ -36,14 +35,6 @@ public class ScheduleDTO {
 
     public void setBusiness(Long business) {
         this.business = business;
-    }
-
-    public List<AppointmentDTO> getAppointments() {
-        return appointments;
-    }
-
-    public void setAppointments(List<AppointmentDTO> appointments) {
-        this.appointments = appointments;
     }
 
     public List<LocalTime> getAvailable_hours() {
