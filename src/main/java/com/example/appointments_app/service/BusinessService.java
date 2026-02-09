@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -223,9 +224,15 @@ public class BusinessService {
      * @param date - The date of the schedule
      * @return - The schedule of business {businessId} and with the date {date}
      */
-    public Schedule findScheduleByDateAndBusiness(Long businessId, LocalDate date) {
+    public ScheduleDTO findScheduleByDateAndBusiness(Long businessId, LocalDate date) {
         findBusinessById(businessId);
-        return scheduleService.getScheduleByDate(businessId, date);
+        Schedule schedule = scheduleService.getScheduleByDate(businessId, date);
+        ScheduleDTO dto = schedule.convertToDTO();
+        List<LocalTime> availableHours = scheduleService.getAvailableHours(schedule.getId());
+
+        dto.setAvailable_hours(availableHours);
+
+        return dto;
     }
 
 

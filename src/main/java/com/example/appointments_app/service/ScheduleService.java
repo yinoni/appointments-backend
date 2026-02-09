@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -45,7 +46,7 @@ public class ScheduleService {
     public Schedule addNewSchedule(Schedule schedule){
         Schedule result = scheduleRepo.save(schedule);
         String key = result.getBusiness().getId() + ":" + result.getId() + ":" + result.getDate();
-        redis.setOffsetsPipelined(key, result.getAvailable_hours(), result.getMin_duration());
+        redis.setOffsetsPipelined(key, result.getAvailable_hours());
         return result;
     }
 
@@ -56,7 +57,7 @@ public class ScheduleService {
 
     public boolean tryToLockSlot(Schedule schedule, LocalTime time, int serviceDuration){
         String key = schedule.getBusiness().getId() + ":" + schedule.getId() + ":" + schedule.getDate();
-        return redis.tryToLockSlot(key, time, schedule.getMin_duration(), serviceDuration);
+        return redis.tryToLockSlot(key, time, serviceDuration);
     }
 
     public Page<Schedule> getSchedulesByBusinessId(Long b_id, int page, int size) {
@@ -64,16 +65,13 @@ public class ScheduleService {
         return scheduleRepo.getSchedulesByBusinessId(b_id, pageable);
     }
 
-    public void pullAvailableHours(Schedule schedule, LocalTime start, int runs){
-        List<LocalTime> availableHours = schedule.getAvailable_hours();
-        int startIndex = availableHours.indexOf(start);
+    public List<LocalTime> getAvailableHours(Long scheduleId){
+        Schedule schedule = findById(scheduleId);
+        long startOffset = redis.getOffset(schedule.getStart_time());
+        long endOffset = redis.getOffset(schedule.getEnd_time());
 
-        for(int i = 0; i < runs; i++){
-            availableHours.remove(startIndex++);
-        }
+        List<LocalTime> availableHours = redis.getHoursFromOffsetRange(schedule.getKey(), startOffset, endOffset, schedule.getMin_duration());
 
-        schedule.setAvailable_hours(availableHours);
-
-        scheduleRepo.save(schedule);
+        return availableHours;
     }
 }

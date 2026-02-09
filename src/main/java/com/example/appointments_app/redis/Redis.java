@@ -15,6 +15,8 @@ import java.util.List;
 public class Redis {
     private final RedisTemplate redisTemplate;
 
+    private final int DAY_DIVIDER = 5;
+
     public Redis(RedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
@@ -27,10 +29,10 @@ public class Redis {
         return  redisTemplate.opsForValue().getBit(key, bit);
     }
 
-    public void setOffsetsPipelined(String key, List<LocalTime> hours, int day_divide) {
+    public void setOffsetsPipelined(String key, List<LocalTime> hours) {
         redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
             for (LocalTime hour : hours) {
-                long offset = getOffset(day_divide, hour);
+                long offset = getOffset(hour);
 
                 // שים לב: כאן משתמשים ב-connection הישיר של Redis
                 connection.stringCommands().setBit(key.getBytes(), offset, false);
@@ -43,13 +45,12 @@ public class Redis {
      *
      * @param key - The key as string
      * @param hour - The hour that we need to check if it is taken or not
-     * @param day_divide - The divider of the day
      * @param duration
      * @return - It tries to set the hours as taken and if the hours is already taken it returns false
      */
-    public boolean tryToLockSlot(String key, LocalTime hour, int day_divide, int duration){
-        long startOffset = getOffset(day_divide, hour);
-        int runs = duration / day_divide;
+    public boolean tryToLockSlot(String key, LocalTime hour, int duration){
+        long startOffset = getOffset(hour);
+        int runs = duration / DAY_DIVIDER;
 
         String luaScript =
                 "for i=0, ARGV[2]-1 do " +
@@ -75,13 +76,33 @@ public class Redis {
 
     /***
      *
-     * @param day_divide - The divider of the day (By minutes)
      * @param hour - The hour
      * @return - The offset of the hour in the redis db
      */
-    public Long getOffset(int day_divide, LocalTime hour){
+    public Long getOffset( LocalTime hour){
         long minutesFromMidnight = ChronoUnit.MINUTES.between(LocalTime.MIDNIGHT, hour);
-        return minutesFromMidnight / day_divide;
+        return minutesFromMidnight / DAY_DIVIDER;
     }
+
+    public LocalTime offsetToLocalTime(int min_duration, long offset){
+        int hour = Math.toIntExact((offset * DAY_DIVIDER) / 60);
+        int minutes = Math.toIntExact((offset * DAY_DIVIDER) % 60);
+
+        return LocalTime.of(hour, minutes);
+    }
+
+    public List<LocalTime> getHoursFromOffsetRange(String key, long start, long end, int min_duration){
+        List<LocalTime> availableHours = new ArrayList<>();
+
+        for(long i = start; i<=end; i++){
+            long offset = (min_duration / DAY_DIVIDER) + i;
+            if(!redisTemplate.opsForValue().getBit(key, offset ))
+                availableHours.add(offsetToLocalTime(min_duration, offset));
+        }
+
+        return availableHours;
+    }
+
+
 
 }

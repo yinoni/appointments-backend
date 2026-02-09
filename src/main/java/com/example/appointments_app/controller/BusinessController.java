@@ -2,6 +2,7 @@ package com.example.appointments_app.controller;
 
 import com.example.appointments_app.model.*;
 import com.example.appointments_app.service.BusinessService;
+import com.example.appointments_app.service.ScheduleService;
 import com.example.appointments_app.util.DateUtils;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static com.example.appointments_app.util.DateUtils.getDateLocalDate;
@@ -20,9 +22,11 @@ import static com.example.appointments_app.util.DateUtils.getDateLocalDate;
 public class BusinessController {
 
     private final BusinessService businessService;
+    private final ScheduleService scheduleService;
 
-    public BusinessController(BusinessService businessService){
+    public BusinessController(BusinessService businessService, ScheduleService scheduleService){
         this.businessService = businessService;
+        this.scheduleService = scheduleService;
     }
 
     /***
@@ -138,9 +142,11 @@ public class BusinessController {
      */
     @GetMapping("/{businessId}/schedule/byDate")
     public ResponseEntity<?> getScheduleByDate(@PathVariable Long businessId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
-        ScheduleDTO scheduleDTO = businessService.findScheduleByDateAndBusiness(businessId, date).convertToDTO();
+        ScheduleDTO scheduleDTO = businessService.findScheduleByDateAndBusiness(businessId, date);
 
         return ResponseEntity.ok(scheduleDTO);
     }
+
+
 
 }

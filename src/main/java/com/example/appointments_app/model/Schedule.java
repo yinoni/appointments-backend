@@ -118,6 +118,10 @@ public class Schedule {
 
 
 
+    public String getKey(){
+        return this.getBusiness().getId() + ":" + this.getId() + ":" + this.getDate();
+    }
+
     public ScheduleDTO convertToDTO(){
         ScheduleDTO scheduleDTO = new ScheduleDTO();
         scheduleDTO.setId(id);
