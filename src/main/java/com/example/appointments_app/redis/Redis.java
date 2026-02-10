@@ -29,13 +29,11 @@ public class Redis {
         return  redisTemplate.opsForValue().getBit(key, bit);
     }
 
-    public void setOffsetsPipelined(String key, List<LocalTime> hours) {
+    public void setOffsetsPipelined(String key, LocalTime start, LocalTime end) {
         redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
-            for (LocalTime hour : hours) {
-                long offset = getOffset(hour);
-
+            for (long i = getOffset(start); i <= getOffset(end); i++) {
                 // שים לב: כאן משתמשים ב-connection הישיר של Redis
-                connection.stringCommands().setBit(key.getBytes(), offset, false);
+                connection.stringCommands().setBit(key.getBytes(), i, false);
             }
             return null; // ה-Template אוסף את התשובות לבד
         });
@@ -94,10 +92,10 @@ public class Redis {
     public List<LocalTime> getHoursFromOffsetRange(String key, long start, long end, int min_duration){
         List<LocalTime> availableHours = new ArrayList<>();
 
-        for(long i = start; i<=end; i++){
-            long offset = (min_duration / DAY_DIVIDER) + i;
-            if(!redisTemplate.opsForValue().getBit(key, offset ))
-                availableHours.add(offsetToLocalTime(min_duration, offset));
+        for(long i = start; i<=end; i+=(min_duration / DAY_DIVIDER)){
+            LocalTime temp = offsetToLocalTime(min_duration, i);
+            if(!redisTemplate.opsForValue().getBit(key, i ))
+                availableHours.add(temp);
         }
 
         return availableHours;

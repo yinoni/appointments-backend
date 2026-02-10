@@ -46,7 +46,7 @@ public class ScheduleService {
     public Schedule addNewSchedule(Schedule schedule){
         Schedule result = scheduleRepo.save(schedule);
         String key = result.getBusiness().getId() + ":" + result.getId() + ":" + result.getDate();
-        redis.setOffsetsPipelined(key, result.getAvailable_hours());
+        redis.setOffsetsPipelined(key, schedule.getStart_time(), schedule.getEnd_time());
         return result;
     }
 

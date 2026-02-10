@@ -78,7 +78,7 @@ public class ScheduleIn {
                 .withStart_time(startTime)
                 .withEnd_time(endTime)
                 .withMin_duration(this.min_duration)
-                .withAvailable_hours(available_hours)
+                //.withAvailable_hours(available_hours)
                 .build();
     }
 

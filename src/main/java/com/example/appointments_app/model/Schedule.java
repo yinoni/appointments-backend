@@ -45,10 +45,6 @@ public class Schedule {
     @Column(nullable = false)
     private LocalTime end_time;
 
-    @Column(nullable = false)
-    private List<LocalTime> available_hours;
-
-
     public Schedule() {
     }
 
@@ -108,16 +104,6 @@ public class Schedule {
         this.end_time = end_time;
     }
 
-    public List<LocalTime> getAvailable_hours() {
-        return available_hours;
-    }
-
-    public void setAvailable_hours(List<LocalTime> available_hours) {
-        this.available_hours = available_hours;
-    }
-
-
-
     public String getKey(){
         return this.getBusiness().getId() + ":" + this.getId() + ":" + this.getDate();
     }
@@ -128,7 +114,7 @@ public class Schedule {
         scheduleDTO.setDate(date);
         scheduleDTO.setBusiness(business.getId());
         //scheduleDTO.setAppointments(appointments.stream().map(Appointment::convertToDTO).toList());
-        scheduleDTO.setAvailable_hours(available_hours);
+        //scheduleDTO.setAvailable_hours(available_hours);
 
         return scheduleDTO;
     }

@@ -7,10 +7,7 @@ import com.example.appointments_app.service.ScheduleService;
 import com.example.appointments_app.service.ServiceService;
 import com.example.appointments_app.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/appointment")
@@ -22,7 +19,6 @@ public class AppointmentController {
     public AppointmentController(AppointmentService appointmentService){
         this.appointmentService = appointmentService;
     }
-
 
     @PostMapping("")
     public ResponseEntity<?> addNewAppointment(@RequestBody AppointmentIn appointmentIn) {

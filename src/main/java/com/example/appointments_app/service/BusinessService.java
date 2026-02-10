@@ -140,13 +140,17 @@ public class BusinessService {
 
         Business business = findBusinessByIdAndOwnerId(businessId, ownerId);
         Schedule schedule = scheduleIn.toSchedule();
+        ScheduleDTO dto;
 
         schedule.setBusiness(business);
         schedule.setAppointments(new ArrayList<>());
 
         schedule = scheduleService.addNewSchedule(schedule);
 
-        return  schedule.convertToDTO();
+        dto = schedule.convertToDTO();
+        dto.setAvailable_hours(scheduleService.getAvailableHours(schedule.getId()));
+
+        return dto;
     }
 
     /***
