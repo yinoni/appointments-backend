@@ -29,6 +29,14 @@ public class BusinessController {
         this.scheduleService = scheduleService;
     }
 
+    @PutMapping("/{businessId}")
+    public ResponseEntity<?> updateBusiness(@PathVariable Long businessId,@AuthenticationPrincipal CustomUserDetails currentUser,@RequestBody BusinessInput businessInput){
+        BusinessDTO dto = businessService.updateBusiness(businessId, currentUser.getId(), businessInput).convertToDTO();
+
+        return ResponseEntity.ok(dto);
+    }
+
+
     /***
      *
      * @param businessInput - The business input data (See BusinessIn class)
@@ -66,31 +74,9 @@ public class BusinessController {
         return ResponseEntity.ok(businessDTO);
     }
 
-    /***
-     *
-     * @param serviceIn - The service data
-     * @param currentUser - The current user data from JWT
-     * @return - This function adds new service to the business
-     * @throws  - BusinessException if the business is not exists
-     */
-    @PostMapping("/addService")
-    public ResponseEntity<?> addService(@Valid @RequestBody ServiceIn serviceIn , @AuthenticationPrincipal CustomUserDetails currentUser){
-        BusinessDTO dto = businessService.addNewService(serviceIn, currentUser.getId());
-        return ResponseEntity.ok(dto);
-    }
 
-    /***
-     *
-     * @param request - The request params for deleting the service from the business (See ServiceRemoveRequest class)
-     * @param currentUser - The current user data from the JWT
-     * @return - removes services from the business by service id
-     * @throw - BusinessException if the business not exists or if the user is not the business owner. It also deletes all the appointments that have link to this service
-     */
-    @PostMapping("/removeService")
-    public ResponseEntity<?> removeService(@Valid @RequestBody ServiceRemoveRequest request, @AuthenticationPrincipal CustomUserDetails currentUser){
-        BusinessDTO dto = businessService.removeService(request, currentUser.getId());
-        return ResponseEntity.ok(dto);
-    }
+
+
 
     /***
      *

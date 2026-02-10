@@ -22,20 +22,17 @@ import static com.example.appointments_app.model.AppointmentBuilder.anAppointmen
 public class BusinessService {
 
     private final BusinessRepo businessRepo;
-    private final ServiceService serviceService;
     private final AppointmentRepo appointmentRepo;
     private final UserService userService;
     private final ScheduleService scheduleService;
 
 
     public BusinessService(BusinessRepo businessRepo,
-                           ServiceService serviceService,
                            AppointmentRepo appointmentRepo,
                            UserService userService,
                            ScheduleService scheduleService,
                            Redis redis){
         this.businessRepo = businessRepo;
-        this.serviceService = serviceService;
         this.appointmentRepo = appointmentRepo;
         this.userService = userService;
         this.scheduleService = scheduleService;
@@ -49,6 +46,16 @@ public class BusinessService {
     public Business findBusinessById(Long b_id){
         return businessRepo.findById(b_id).orElseThrow(() ->
                 new BusinessException("Business not found!", HttpStatus.NOT_FOUND));
+    }
+
+    public Business save(Business business){
+        return businessRepo.save(business);
+    }
+
+    public Business updateBusiness(Long b_id, Long ownerId, BusinessInput businessInput){
+        Business business = findBusinessByIdAndOwnerId(b_id, ownerId);
+        business.setBusinessName(businessInput.getBusinessName());
+        return save(business);
     }
 
     /***
@@ -66,7 +73,7 @@ public class BusinessService {
         business.setSchedules(new ArrayList<>());
         business.setServices(new ArrayList<>());
         try{
-            return businessRepo.save(business).convertToDTO();
+            return save(business).convertToDTO();
         }
         catch (Exception e){
             throw new BusinessCreationException("Business name already exists!", HttpStatus.CONFLICT);
@@ -120,51 +127,7 @@ public class BusinessService {
         return bDTO;
     }
 
-    /***
-     *
-     * @param serviceIn - The service input ( see ServiceIn class)
-     * @param ownerId - The owner id
-     * @return - DTO of the service that just added
-     */
-    public BusinessDTO addNewService(ServiceIn serviceIn, Long ownerId){
-        Business business = findBusinessByIdAndOwnerId(serviceIn.getBusinessId(), ownerId);
 
-        com.example.appointments_app.model.Service service = serviceIn.toService();
-
-        service.setBusiness(business);
-
-        service = serviceService.addNewService(service);
-
-        business.getServices().add(service);
-
-        businessRepo.save(business);
-
-        return business.convertToDTO();
-    }
-
-    /***
-     *
-     * @param request - see ServiceRemoveRequest class
-     * @param ownerId - The owner id
-     * @return - DTO of the service that just deleted
-     */
-    public BusinessDTO removeService(ServiceRemoveRequest request, Long ownerId) {
-        // 1. מציאת העסק
-        Business business = findBusinessByIdAndOwnerId(request.getBusinessId(), ownerId);
-
-        com.example.appointments_app.model.Service service = serviceService.findById(request.getServiceId());
-
-        // Check if the business id of the service and the business id from the request are equal
-        if(!Objects.equals(service.getBusiness().getId(), request.getBusinessId()))
-            throw new BusinessException("The business not contains this service!", HttpStatus.BAD_GATEWAY);
-
-        appointmentRepo.deleteAppointmentByServiceId(request.getServiceId());
-
-        business.getServices().removeIf(s -> s.getId().equals(request.getServiceId()));
-
-        // 3. שמירת העסק - בזכות orphanRemoval=true, ה-Service יימחק מה-DB אוטומטית!
-        return businessRepo.save(business).convertToDTO();
-    }
 
     /***
      *

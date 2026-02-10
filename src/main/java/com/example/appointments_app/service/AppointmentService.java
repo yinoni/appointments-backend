@@ -1,9 +1,11 @@
 package com.example.appointments_app.service;
 
 import com.example.appointments_app.exception.AppointmentAlreadyExistsException;
+import com.example.appointments_app.exception.BusinessException;
 import com.example.appointments_app.exception.ServiceNotFoundException;
 import com.example.appointments_app.model.*;
 import com.example.appointments_app.repo.AppointmentRepo;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
@@ -32,6 +34,9 @@ public class AppointmentService {
         Schedule schedule = scheduleService.findById(appointmentIn.getScheduleId());
         com.example.appointments_app.model.Service service = serviceService.findById(appointmentIn.getServiceId());
         User user = userService.findByPhone(appointmentIn.getPhone());
+
+        if(schedule.getBusiness().getId() != service.getBusiness().getId())
+            throw new BusinessException("The business doesn't have the schedule or the service!", HttpStatus.BAD_REQUEST);
 
         app.setSchedule(schedule);
         app.setService(service);
