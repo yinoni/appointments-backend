@@ -1,10 +1,8 @@
 package com.example.appointments_app.service;
 
 import com.example.appointments_app.exception.AuthenticationException;
-import com.example.appointments_app.model.AuthRequest;
-import com.example.appointments_app.model.CustomUserDetails;
-import com.example.appointments_app.model.User;
-import com.example.appointments_app.model.UserIn;
+import com.example.appointments_app.kafka.UserProducer;
+import com.example.appointments_app.model.*;
 import com.example.appointments_app.repo.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,10 +19,12 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserProducer userProducer;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder){
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserProducer userProducer){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userProducer = userProducer;
     }
 
     public User findById(Long id){
@@ -39,11 +39,16 @@ public class UserService implements UserDetailsService {
     public User register(UserIn userIn){
         try{
             Optional<User> user = userRepository.findUserByEmail(userIn.getEmail());
-
+            UserEventDTO dto;
             if(user.isPresent())
                 throw new com.example.appointments_app.exception.AuthenticationException("Email already exists!", HttpStatus.NOT_MODIFIED);
             User newUser = userIn.toUser();
             newUser.setPassword(passwordEncoder.encode(userIn.getPassword()));
+
+            dto = new UserEventDTO(newUser.getFullName(), newUser.getEmail(), newUser.getPhoneNumber());
+
+            userProducer.userRegisteredEvent(dto);
+
             return userRepository.save(newUser);
         }
         catch(AuthenticationException e){
