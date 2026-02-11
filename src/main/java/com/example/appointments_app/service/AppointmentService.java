@@ -53,7 +53,7 @@ public class AppointmentService {
 
         app = appointmentRepo.save(app);
 
-        event = new AppointmentEventDTO(user.getFullName(), user.getPhoneNumber(), app.getTime(), schedule.getBusiness().getBusinessName());
+        event = new AppointmentEventDTO(user.getFullName(), user.getPhoneNumber(), app.getTime(), schedule.getBusiness().getBusinessName(), schedule.getDate());
 
         appointmentProducer.sendAppointmentEvent(event);
 

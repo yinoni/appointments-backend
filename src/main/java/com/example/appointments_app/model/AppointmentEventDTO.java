@@ -1,6 +1,7 @@
 package com.example.appointments_app.model;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class AppointmentEventDTO implements Serializable {
@@ -8,13 +9,15 @@ public class AppointmentEventDTO implements Serializable {
     private String phone;
     private LocalTime time;
     private String businessName;
+    private LocalDate date;
 
 
-    public AppointmentEventDTO(String fullname, String phone, LocalTime time, String businessName) {
+    public AppointmentEventDTO(String fullname, String phone, LocalTime time, String businessName, LocalDate date) {
         this.fullname = fullname;
         this.phone = phone;
         this.time = time;
         this.businessName = businessName;
+        this.date = date;
     }
 
     public AppointmentEventDTO() {
@@ -50,5 +53,13 @@ public class AppointmentEventDTO implements Serializable {
 
     public void setBusinessName(String businessName) {
         this.businessName = businessName;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 }
