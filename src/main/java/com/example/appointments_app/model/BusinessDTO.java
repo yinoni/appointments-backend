@@ -6,6 +6,8 @@ import java.util.Set;
 public class BusinessDTO {
     private Long id;
     private String businessName;
+    private String description;
+    private String address;
     private UserDTO owner;
     private Integer totalAppointments;
     private List<ServiceDTO> services;
@@ -61,5 +63,21 @@ public class BusinessDTO {
 
     public void setSchedules(List<ScheduleDTO> schedules) {
         this.schedules = schedules;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

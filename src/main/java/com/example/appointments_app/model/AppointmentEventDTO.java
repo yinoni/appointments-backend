@@ -10,14 +10,20 @@ public class AppointmentEventDTO implements Serializable {
     private LocalTime time;
     private String businessName;
     private LocalDate date;
+    private String serviceName;
 
-
-    public AppointmentEventDTO(String fullname, String phone, LocalTime time, String businessName, LocalDate date) {
+    public AppointmentEventDTO(String fullname,
+                               String phone,
+                               LocalTime time,
+                               String businessName,
+                               LocalDate date,
+                               String serviceName) {
         this.fullname = fullname;
         this.phone = phone;
         this.time = time;
         this.businessName = businessName;
         this.date = date;
+        this.serviceName = serviceName;
     }
 
     public AppointmentEventDTO() {
@@ -61,5 +67,13 @@ public class AppointmentEventDTO implements Serializable {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 }

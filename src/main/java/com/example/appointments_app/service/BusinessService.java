@@ -55,6 +55,9 @@ public class BusinessService {
     public Business updateBusiness(Long b_id, Long ownerId, BusinessInput businessInput){
         Business business = findBusinessByIdAndOwnerId(b_id, ownerId);
         business.setBusinessName(businessInput.getBusinessName());
+        business.setDescription(businessInput.getBusinessDesc());
+        business.setCity(businessInput.getCity());
+        business.setStreet(businessInput.getStreet());
         return save(business);
     }
 
@@ -72,12 +75,8 @@ public class BusinessService {
         business.setTotalAppointments(0);
         business.setSchedules(new ArrayList<>());
         business.setServices(new ArrayList<>());
-        try{
-            return save(business).convertToDTO();
-        }
-        catch (Exception e){
-            throw new BusinessCreationException("Business name already exists!", HttpStatus.CONFLICT);
-        }
+
+        return save(business).convertToDTO();
     }
 
     /***

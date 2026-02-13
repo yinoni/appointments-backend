@@ -132,7 +132,4 @@ public class BusinessController {
 
         return ResponseEntity.ok(scheduleDTO);
     }
-
-
-
 }

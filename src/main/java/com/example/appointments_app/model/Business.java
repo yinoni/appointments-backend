@@ -31,6 +31,15 @@ public class Business {
     @OneToMany(mappedBy = "business", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Schedule> schedules;
 
+    @Column(nullable = false, name="description", columnDefinition = "varchar(255) default 'N/A'")
+    private String description;
+
+    @Column(nullable = false, name = "city", columnDefinition = "varchar(255) default 'N/A'")
+    private String city;
+
+    @Column(nullable = false, name = "street", columnDefinition = "varchar(255) default 'N/A'")
+    private String street;
+
 
     public Business() {
     }
@@ -88,6 +97,30 @@ public class Business {
         this.schedules = schedules;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
     public BusinessDTO convertToDTO(){
         BusinessDTO dto = new BusinessDTO();
         List<ServiceDTO> services = this.services.stream().map(Service::convertToDTO).toList();
@@ -95,6 +128,8 @@ public class Business {
 
         dto.setId(this.id);
         dto.setBusinessName(this.businessName);
+        dto.setDescription(this.description);
+        dto.setAddress(this.city + ", " + this.street);
         dto.setOwner(this.owner.convertToUserDTO());
         dto.setTotalAppointments(this.totalAppointments);
         dto.setServices(services);

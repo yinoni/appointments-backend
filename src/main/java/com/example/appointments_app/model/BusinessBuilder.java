@@ -8,6 +8,10 @@ public final class BusinessBuilder {
     private User owner;
     private Integer totalAppointments;
     private List<Service> services;
+    private List<Schedule> schedules;
+    private String description;
+    private String city;
+    private String street;
 
     private BusinessBuilder() {
     }
@@ -41,6 +45,26 @@ public final class BusinessBuilder {
         return this;
     }
 
+    public BusinessBuilder withSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
+        return this;
+    }
+
+    public BusinessBuilder withDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    public BusinessBuilder withCity(String city) {
+        this.city = city;
+        return this;
+    }
+
+    public BusinessBuilder withStreet(String street) {
+        this.street = street;
+        return this;
+    }
+
     public Business build() {
         Business business = new Business();
         business.setId(id);
@@ -48,6 +72,10 @@ public final class BusinessBuilder {
         business.setOwner(owner);
         business.setTotalAppointments(totalAppointments);
         business.setServices(services);
+        business.setSchedules(schedules);
+        business.setDescription(description);
+        business.setCity(city);
+        business.setStreet(street);
         return business;
     }
 }
