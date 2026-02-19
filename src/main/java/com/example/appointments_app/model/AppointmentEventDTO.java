@@ -2,6 +2,7 @@ package com.example.appointments_app.model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class AppointmentEventDTO implements Serializable {
@@ -11,19 +12,26 @@ public class AppointmentEventDTO implements Serializable {
     private String businessName;
     private LocalDate date;
     private String serviceName;
+    private Long serviceId;
+    private Double price;
+
 
     public AppointmentEventDTO(String fullname,
                                String phone,
                                LocalTime time,
                                String businessName,
                                LocalDate date,
-                               String serviceName) {
+                               String serviceName,
+                               Long serviceId,
+                               Double price) {
         this.fullname = fullname;
         this.phone = phone;
         this.time = time;
         this.businessName = businessName;
         this.date = date;
         this.serviceName = serviceName;
+        this.serviceId = serviceId;
+        this.price = price;
     }
 
     public AppointmentEventDTO() {
@@ -75,5 +83,33 @@ public class AppointmentEventDTO implements Serializable {
 
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
+    }
+
+    public Long getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(Long serviceId) {
+        this.serviceId = serviceId;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public AppointmentIndex toIndex(){
+        AppointmentIndex index = new AppointmentIndex();
+        index.setBusinessName(this.businessName);
+        index.setStatus("COMPLETED");
+        index.setServiceName(this.serviceName);
+        index.setTimeCreated(LocalDateTime.of(this.date, this.time));
+        index.setServiceId(this.serviceId);
+        index.setServicePrice(this.price);
+
+        return index;
     }
 }

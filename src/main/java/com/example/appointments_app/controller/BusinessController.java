@@ -61,6 +61,13 @@ public class BusinessController {
         return new ResponseEntity<>(businessesDTO, HttpStatus.OK);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchBusiness(@RequestParam("text") String text){
+        String result = businessService.searchBusiness(text);
+
+        return ResponseEntity.ok(result);
+    }
+
     /***
      *
      * @param businessId - The business id

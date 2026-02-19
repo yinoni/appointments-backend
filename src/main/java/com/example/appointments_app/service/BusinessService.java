@@ -1,6 +1,8 @@
 package com.example.appointments_app.service;
 
+import com.example.appointments_app.elasticsearch.ElasticSearchService;
 import com.example.appointments_app.exception.*;
+import com.example.appointments_app.kafka.BusinessProducer;
 import com.example.appointments_app.model.*;
 import com.example.appointments_app.redis.Redis;
 import com.example.appointments_app.repo.AppointmentRepo;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -25,17 +28,22 @@ public class BusinessService {
     private final AppointmentRepo appointmentRepo;
     private final UserService userService;
     private final ScheduleService scheduleService;
+    private final BusinessProducer businessProducer;
+    private final ElasticSearchService elasticSearchService;
 
 
     public BusinessService(BusinessRepo businessRepo,
                            AppointmentRepo appointmentRepo,
                            UserService userService,
                            ScheduleService scheduleService,
-                           Redis redis){
+                           ElasticSearchService elasticSearchService,
+                           BusinessProducer businessProducer){
         this.businessRepo = businessRepo;
         this.appointmentRepo = appointmentRepo;
         this.userService = userService;
         this.scheduleService = scheduleService;
+        this.businessProducer = businessProducer;
+        this.elasticSearchService = elasticSearchService;
     }
 
     /***
@@ -69,6 +77,7 @@ public class BusinessService {
      */
     public BusinessDTO createBusiness(BusinessInput businessInput, Long ownerId){
         User user = userService.findById(ownerId);
+        BusinessDTO bDTO;
 
         Business business = businessInput.toBusiness();
         business.setOwner(user);
@@ -76,7 +85,11 @@ public class BusinessService {
         business.setSchedules(new ArrayList<>());
         business.setServices(new ArrayList<>());
 
-        return save(business).convertToDTO();
+        bDTO = save(business).convertToDTO();
+
+        businessProducer.sendBusinessCreatedEvent(bDTO);
+
+        return  bDTO;
     }
 
     /***
@@ -99,6 +112,16 @@ public class BusinessService {
         List<Business> businesses = businessRepo.findAllByOwnerId(ownerId);
 
         return businesses.stream().map(Business::convertToDTO).toList();
+    }
+
+    public String searchBusiness(String text){
+        String s = "";
+        try{
+             s = elasticSearchService.search("businesses", text);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        return s;
     }
 
 

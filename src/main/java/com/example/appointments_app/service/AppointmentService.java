@@ -59,7 +59,9 @@ public class AppointmentService {
                 app.getTime(),
                 schedule.getBusiness().getBusinessName(),
                 schedule.getDate(),
-                service.getServiceName()
+                service.getServiceName(),
+                service.getId(),
+                service.getPrice()
         );
 
         appointmentProducer.sendAppointmentEvent(event);
