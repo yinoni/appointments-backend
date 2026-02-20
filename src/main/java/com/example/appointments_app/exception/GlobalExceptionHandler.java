@@ -1,5 +1,6 @@
 package com.example.appointments_app.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,6 +43,14 @@ public class GlobalExceptionHandler {
         String message = String.format("הערך '%s' אינו תקין עבור השדה %s", ex.getValue(), ex.getName());
         ErrorResponse er = new ErrorResponse(message, HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(er, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public  ResponseEntity<ErrorResponse> handleDuplicate(DataIntegrityViolationException ex){
+        String message = "Duplicate values! entity with this key already exists!";
+        ErrorResponse er = new ErrorResponse(message, HttpStatus.CONFLICT);
+
+        return new ResponseEntity<>(er, er.getStatus());
     }
 
 }
