@@ -31,6 +31,10 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(id).orElseThrow(()->new UsernameNotFoundException("User not found"));
     }
 
+    public Optional<User> findByEmail(String email){
+        return userRepository.findUserByEmail(email);
+    }
+
     public User findByPhone(String phone){
         return userRepository.findUserByPhoneNumber(phone).orElseThrow(()->new UsernameNotFoundException("User not found"));
     }

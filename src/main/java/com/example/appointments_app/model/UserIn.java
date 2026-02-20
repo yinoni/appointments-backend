@@ -12,6 +12,12 @@ public class UserIn {
     public UserIn() {
     }
 
+    public UserIn(String fullName, String email, String password) {
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+    }
+
     public String getFullName() {
         return fullName;
     }

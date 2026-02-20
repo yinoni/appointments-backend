@@ -2,6 +2,9 @@ package com.example.appointments_app.config;
 
 import com.example.appointments_app.jwt.JwtFilter;
 import com.example.appointments_app.jwt.JwtService;
+import com.example.appointments_app.oauth2.OAuth2LoginSuccessHandler;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -15,6 +18,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private OAuth2LoginSuccessHandler successHandler;
 
     private final JwtService jwtService;
 
@@ -41,9 +47,20 @@ public class SecurityConfig {
                                 "/authenticate/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/login/**",
+                                "/oauth2/**"
                         ).permitAll()
                         .anyRequest().authenticated()
+                )
+                // הוספת היכולת של OAuth2
+                .oauth2Login(oauth -> oauth
+                        .successHandler(successHandler) // ה-Handler שבנינו קודם
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                        })
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
