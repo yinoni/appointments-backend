@@ -1,11 +1,8 @@
 package com.example.appointments_app.controller;
 
 import com.example.appointments_app.model.CustomUserDetails;
-import com.example.appointments_app.model.HomeDTO;
-import com.example.appointments_app.redis.Redis;
+import com.example.appointments_app.model.ScreensDTO.HomeDTO;
 import com.example.appointments_app.service.AppService;
-import com.example.appointments_app.service.AuthService;
-import com.example.appointments_app.service.BusinessService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;

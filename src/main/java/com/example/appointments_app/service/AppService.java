@@ -3,7 +3,8 @@ package com.example.appointments_app.service;
 import com.example.appointments_app.elasticsearch.ElasticSearchService;
 import com.example.appointments_app.exception.ScheduleNotFoundException;
 import com.example.appointments_app.model.*;
-import com.example.appointments_app.model.data_aggregation.WeeklyRevenueData;
+import com.example.appointments_app.model.ScreensDTO.HomeDTO;
+import com.example.appointments_app.model.data_aggregation.RevenueData;
 import com.example.appointments_app.repo.AppointmentRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,19 +40,15 @@ public class AppService {
     public HomeDTO getHomePageDTO(Long userId){
         List<BusinessDTO> businesses = businessService.getBusinessesByOwnerId(userId);
         List<AppointmentDTO> appointmentDTOS = new ArrayList<>();
-        List<WeeklyRevenueData> revenueDataList = new ArrayList<>();
+        List<RevenueData> revenueDataList = new ArrayList<>();
 
         if (businesses.isEmpty()) {
             log.info("No businesses found for user {}", userId);
             return new HomeDTO(businesses, appointmentDTOS, revenueDataList);
         }
         Long businessId = businesses.get(0).getId();
-        try{
-            revenueDataList = esService.getWeeklyRevenue(businessId);
-        }
-        catch (IOException e){
-            System.err.println(e.getMessage());
-        }
+
+        revenueDataList = esService.getRevenueAnalytics(businessId, "7_DAYS");
 
 
         try{

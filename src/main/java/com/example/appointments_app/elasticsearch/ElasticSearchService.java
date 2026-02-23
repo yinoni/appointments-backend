@@ -1,6 +1,6 @@
 package com.example.appointments_app.elasticsearch;
 
-import com.example.appointments_app.model.data_aggregation.WeeklyRevenueData;
+import com.example.appointments_app.model.data_aggregation.RevenueData;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
@@ -9,13 +9,15 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ElasticSearchService {
     private final OkHttpClient client = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String ELASTIC_URL = "http://localhost:9200";
+
+
+    public record AnalyticsConfig(String range, String interval) {}
 
     // פונקציה להכנסת נתונים (Index)
     public String indexDocument(String index, String id, Object data) throws IOException {
@@ -66,39 +68,52 @@ public class ElasticSearchService {
         }
     }
 
-    public List<WeeklyRevenueData> getWeeklyRevenue(Long businessId) throws IOException {
+    public List<RevenueData> getRevenueAnalytics(Long businessId, String userSelection){
+        AnalyticsConfig dateData = switch (userSelection) {
+            case "5_DAYS" -> new AnalyticsConfig("now-5d/d", "1d");
+            case "7_DAYS" -> new AnalyticsConfig("now-7d/d", "1d");
+            case "30_DAYS" -> new AnalyticsConfig("now-30d/d", "1d");
+            case "6_MONTHS" -> new AnalyticsConfig("now-6M/w", "1w");
+            case "YEAR" -> new AnalyticsConfig("now-1y/M", "1M");
+            case "ALL_TIME" -> new AnalyticsConfig("0", "1M"); // Epoch 0
+            default -> throw new RuntimeException("Invalid interval: " + userSelection);
+        };
+
+        List<RevenueData> revenueDataList = new ArrayList<>();
+
         String pipeline = """
-        {
-          "size": 0, 
-          "query": {
-            "bool": {
-              "filter": [
-                { "term": { "businessId": %d } },
-                { "range": { "timeCreated": { "gte": "now-7d/d", "lte": "now/d" } } }
-              ]
-            }
-          },
-          "aggs": {
-            "revenue_over_time": {
-              "date_histogram": {
-                "field": "timeCreated",
-                "fixed_interval": "1d",
-                "format": "yyyy-MM-dd",
-                "extended_bounds": {
-                  "min": "now-7d/d",
-                  "max": "now/d"
+            {
+              "size": 0, 
+              "query": {
+                "bool": {
+                  "filter": [
+                    { "term": { "businessId": %d } },
+                    { "range": { "timeCreated": { "gte": "%s", "lte": "now/d" } } }
+                  ]
                 }
               },
               "aggs": {
-                "daily_revenue": {
-                  "sum": { "field": "servicePrice" }
+                "revenue_over_time": {
+                  "date_histogram": {
+                    "field": "timeCreated",
+                    "fixed_interval": "%s",
+                    "format": "yyyy-MM-dd",
+                    "extended_bounds": {
+                      "min": "%s",
+                      "max": "now/d"
+                    }
+                  },
+                  "aggs": {
+                    "daily_revenue": {
+                      "sum": { "field": "servicePrice" }
+                    }
+                  }
                 }
               }
             }
-          }
-        }
-    """;
-        String finalPipeline = String.format(pipeline, businessId);
+        """;
+
+        String finalPipeline = String.format(pipeline, businessId, dateData.range, dateData.interval, dateData.range);
 
         RequestBody body = RequestBody.create(
                 finalPipeline, MediaType.parse("application/json; charset=utf-8"));
@@ -113,17 +128,17 @@ public class ElasticSearchService {
                 System.err.println("Failed to insert to Elastic: " + res.code() + " " + res.message());
             } else {
                 String resBody = res.body().string();
-                return this.getWeeklyRevenue(resBody);
+                revenueDataList = this.fetchRevenueAggregation(resBody);
             }
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         }
 
-        return new ArrayList<>();
-
+        return revenueDataList;
     }
 
-
-    private List<WeeklyRevenueData> getWeeklyRevenue(String data){
-        List<WeeklyRevenueData> revenueDataList = new ArrayList<>();
+    private List<RevenueData> fetchRevenueAggregation(String data){
+        List<RevenueData> revenueDataList = new ArrayList<>();
         JsonNode root = objectMapper.readTree(data);
 
         JsonNode buckets = root.path("aggregations")
@@ -135,7 +150,7 @@ public class ElasticSearchService {
                 String date = bucket.path("key_as_string").asText();
                 double amount = bucket.path("daily_revenue").path("value").asDouble();
 
-                revenueDataList.add(new WeeklyRevenueData(date, amount));
+                revenueDataList.add(new RevenueData(date, amount));
             }
         }
 
