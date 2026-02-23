@@ -11,7 +11,6 @@ public class BusinessDTO {
     private UserDTO owner;
     private Integer totalAppointments;
     private List<ServiceDTO> services;
-    private List<ScheduleDTO> schedules;
 
 
     public BusinessDTO(){}
@@ -55,14 +54,6 @@ public class BusinessDTO {
 
     public void setServices(List<ServiceDTO> services) {
         this.services = services;
-    }
-
-    public List<ScheduleDTO> getSchedules() {
-        return schedules;
-    }
-
-    public void setSchedules(List<ScheduleDTO> schedules) {
-        this.schedules = schedules;
     }
 
     public String getDescription() {

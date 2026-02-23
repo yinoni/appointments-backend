@@ -133,7 +133,6 @@ public class Business {
         dto.setOwner(this.owner.convertToUserDTO());
         dto.setTotalAppointments(this.totalAppointments);
         dto.setServices(services);
-        dto.setSchedules(schedules);
 
         return dto;
     }

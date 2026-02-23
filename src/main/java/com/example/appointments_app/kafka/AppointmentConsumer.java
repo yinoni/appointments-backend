@@ -1,12 +1,14 @@
 package com.example.appointments_app.kafka;
 
 import com.example.appointments_app.elasticsearch.ElasticSearchService;
-import com.example.appointments_app.model.AppointmentEventDTO;
-import com.example.appointments_app.model.AppointmentIndex;
+import com.example.appointments_app.model.*;
 import com.example.appointments_app.service.SmsService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Service
 public class AppointmentConsumer {
@@ -28,16 +30,17 @@ public class AppointmentConsumer {
     public void sendAppointmentDetailsSMS(String event) {
         try{
             AppointmentEventDTO dto = om.readValue(event, AppointmentEventDTO.class);
+            LocalDate date = dto.getAppointmentDate().toLocalDate();
+            LocalTime time = dto.getAppointmentDate().toLocalTime();
             AppointmentIndex index = dto.toIndex();
 
 
             String msg = "Business Name: " + dto.getBusinessName() +
-                    "\nService: " + dto.getServiceName() +
-                    "\n\nDate: " + dto.getDate().toString() +
-                    "\nTime: " + dto.getTime().toString() +
+                    "\n\nDate: " + date+
+                    "\nTime: " + time +
                     "\n\nWe are waiting for you :)";
 
-            smsService.sendSMS(dto.getPhone(), msg);
+            smsService.sendSMS(dto.getPhoneNumber(), msg);
             elasticSearchService.insertDocument("appointments_history", index);
         }
         catch(Exception e){

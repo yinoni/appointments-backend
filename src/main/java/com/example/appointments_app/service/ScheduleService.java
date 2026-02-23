@@ -2,10 +2,7 @@ package com.example.appointments_app.service;
 
 import com.example.appointments_app.exception.BusinessException;
 import com.example.appointments_app.exception.ScheduleNotFoundException;
-import com.example.appointments_app.model.CustomUserDetails;
-import com.example.appointments_app.model.Schedule;
-import com.example.appointments_app.model.ScheduleDTO;
-import com.example.appointments_app.model.ScheduleIn;
+import com.example.appointments_app.model.*;
 import com.example.appointments_app.redis.Redis;
 import com.example.appointments_app.repo.ScheduleRepo;
 import org.springframework.data.domain.Page;
@@ -31,7 +28,6 @@ public class ScheduleService {
     {
         this.scheduleRepo = scheduleRepo;
         this.redis = redis;
-
     }
 
     public Schedule findById(Long scheduleId){

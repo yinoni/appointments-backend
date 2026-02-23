@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -54,14 +55,14 @@ public class AppointmentService {
         app = appointmentRepo.save(app);
 
         event = new AppointmentEventDTO(
-                user.getFullName(),
-                user.getPhoneNumber(),
-                app.getTime(),
+                schedule.getBusiness().getId(),
+                app.getId(),
                 schedule.getBusiness().getBusinessName(),
-                schedule.getDate(),
-                service.getServiceName(),
                 service.getId(),
-                service.getPrice()
+                app.getService().getPrice(),
+                LocalDateTime.of(schedule.getDate(), app.getTime()),
+                "CREATED",
+                user.getPhoneNumber()
         );
 
         appointmentProducer.sendAppointmentEvent(event);

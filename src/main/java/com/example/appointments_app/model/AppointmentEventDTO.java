@@ -6,91 +6,52 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class AppointmentEventDTO implements Serializable {
-    private String fullname;
-    private String phone;
-    private LocalTime time;
+    private Long businessId;
+    private Long appointmentId;
     private String businessName;
-    private LocalDate date;
-    private String serviceName;
     private Long serviceId;
+    private String phoneNumber;
+
+    // נתונים לצורך האגרגציה ב-Elastic
     private Double price;
+    private LocalDateTime appointmentDate;
+
+    // Metadata - קריטי לניהול האירוע
+    private String eventType; // למשל: "CREATED", "CANCELLED", "UPDATED"
 
 
-    public AppointmentEventDTO(String fullname,
-                               String phone,
-                               LocalTime time,
+    public AppointmentEventDTO(Long businessId,
+                               Long appointmentId,
                                String businessName,
-                               LocalDate date,
-                               String serviceName,
                                Long serviceId,
-                               Double price) {
-        this.fullname = fullname;
-        this.phone = phone;
-        this.time = time;
+                               Double price,
+                               LocalDateTime appointmentDate,
+                               String eventType,
+                               String phoneNumber) {
+        this.businessId = businessId;
+        this.appointmentId = appointmentId;
         this.businessName = businessName;
-        this.date = date;
-        this.serviceName = serviceName;
         this.serviceId = serviceId;
         this.price = price;
+        this.appointmentDate = appointmentDate;
+        this.eventType = eventType;
+        this.phoneNumber = phoneNumber;
     }
 
-    public AppointmentEventDTO() {
+    public Long getBusinessId() {
+        return businessId;
     }
 
-    public String getFullname() {
-        return fullname;
+    public void setBusinessId(Long businessId) {
+        this.businessId = businessId;
     }
 
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
+    public Long getAppointmentId() {
+        return appointmentId;
     }
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public LocalTime getTime() {
-        return time;
-    }
-
-    public void setTime(LocalTime time) {
-        this.time = time;
-    }
-
-    public String getBusinessName() {
-        return businessName;
-    }
-
-    public void setBusinessName(String businessName) {
-        this.businessName = businessName;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
-
-    public Long getServiceId() {
-        return serviceId;
-    }
-
-    public void setServiceId(Long serviceId) {
-        this.serviceId = serviceId;
+    public void setAppointmentId(Long appointmentId) {
+        this.appointmentId = appointmentId;
     }
 
     public Double getPrice() {
@@ -101,14 +62,54 @@ public class AppointmentEventDTO implements Serializable {
         this.price = price;
     }
 
+    public LocalDateTime getAppointmentDate() {
+        return appointmentDate;
+    }
+
+    public void setAppointmentDate(LocalDateTime appointmentDate) {
+        this.appointmentDate = appointmentDate;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    public String getBusinessName() {
+        return businessName;
+    }
+
+    public void setBusinessName(String businessName) {
+        this.businessName = businessName;
+    }
+
+    public Long getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(Long serviceId) {
+        this.serviceId = serviceId;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     public AppointmentIndex toIndex(){
         AppointmentIndex index = new AppointmentIndex();
-        index.setBusinessName(this.businessName);
-        index.setStatus("COMPLETED");
-        index.setServiceName(this.serviceName);
-        index.setTimeCreated(LocalDateTime.of(this.date, this.time));
+        index.setBusinessId(this.businessId);
         index.setServiceId(this.serviceId);
+        index.setBusinessName(this.businessName);
         index.setServicePrice(this.price);
+        index.setTimeCreated(this.appointmentDate);
+        index.setStatus(this.eventType);
 
         return index;
     }

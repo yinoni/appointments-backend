@@ -5,22 +5,23 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 
 public class AppointmentIndex {
+    private Long businessId;
     private String businessName;
-    private String serviceName;
+    private Long serviceId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime timeCreated;
     private String status;
-    private Long serviceId;
     private Double servicePrice;
 
     public AppointmentIndex() {
     }
 
-    public AppointmentIndex(String businessName, String serviceName, LocalDateTime timeCreated, String status) {
-        this.businessName = businessName;
-        this.serviceName = serviceName;
-        this.timeCreated = timeCreated;
-        this.status = status;
+    public Long getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(Long businessId) {
+        this.businessId = businessId;
     }
 
     public String getBusinessName() {
@@ -31,13 +32,6 @@ public class AppointmentIndex {
         this.businessName = businessName;
     }
 
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
 
     public LocalDateTime getTimeCreated() {
         return timeCreated;

@@ -1,5 +1,6 @@
 package com.example.appointments_app.repo;
 
+import com.example.appointments_app.model.Appointment;
 import com.example.appointments_app.model.Schedule;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
