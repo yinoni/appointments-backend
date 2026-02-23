@@ -6,22 +6,14 @@ import java.util.Set;
 public class BusinessDTO {
     private Long id;
     private String businessName;
+    private String description;
+    private String address;
     private UserDTO owner;
     private Integer totalAppointments;
-    private Set<AppointmentDTO> availableAppointments;
     private List<ServiceDTO> services;
 
 
     public BusinessDTO(){}
-
-    public BusinessDTO(Long id, String businessName, UserDTO owner, Integer totalAppointments, Set<AppointmentDTO> availableAppointments, List<ServiceDTO> services) {
-        this.id = id;
-        this.businessName = businessName;
-        this.owner = owner;
-        this.totalAppointments = totalAppointments;
-        this.availableAppointments = availableAppointments;
-        this.services = services;
-    }
 
     public Long getId() {
         return id;
@@ -55,13 +47,6 @@ public class BusinessDTO {
         this.totalAppointments = totalAppointments;
     }
 
-    public Set<AppointmentDTO> getAvailableAppointments() {
-        return availableAppointments;
-    }
-
-    public void setAvailableAppointments(Set<AppointmentDTO> availableAppointments) {
-        this.availableAppointments = availableAppointments;
-    }
 
     public List<ServiceDTO> getServices() {
         return services;
@@ -69,5 +54,21 @@ public class BusinessDTO {
 
     public void setServices(List<ServiceDTO> services) {
         this.services = services;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

@@ -3,11 +3,16 @@ package com.example.appointments_app.repo;
 import com.example.appointments_app.model.Appointment;
 import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 public interface AppointmentRepo extends CrudRepository<Appointment, Long> {
+
     @Modifying
     @Transactional
     @Query("UPDATE Appointment a SET a.service = null WHERE a.service.id = :serviceId")
@@ -23,4 +28,8 @@ public interface AppointmentRepo extends CrudRepository<Appointment, Long> {
     @Transactional
     @Query("DELETE FROM Appointment a WHERE a.service.id = :serviceId")
     void deleteAppointmentByServiceId(@Param("serviceId") Long serviceId);
+
+
+    @Query("SELECT a FROM Appointment a WHERE a.schedule.id = :s_id ORDER BY a.time ASC")
+    Page<Appointment> getAppointmentsByScheduleId(@Param("s_id") Long s_id, PageRequest pageRequest);
 }

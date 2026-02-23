@@ -1,60 +1,56 @@
 package com.example.appointments_app.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.security.SignatureException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<?> hanleAuthException(AuthenticationException ae){
-        ErrorResponse er = new ErrorResponse(ae.getMessage(), ae.getStatus());
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<?> handleBaseException(BaseException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), ex.getStatus());
+
+        return new ResponseEntity<>(errorResponse, ex.getStatus());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        String message = String.format("הערך '%s' אינו תקין עבור השדה %s", ex.getValue(), ex.getName());
+        ErrorResponse er = new ErrorResponse(message, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(er, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public  ResponseEntity<ErrorResponse> handleDuplicate(DataIntegrityViolationException ex){
+        String message = "Duplicate values! entity with this key already exists!";
+        ErrorResponse er = new ErrorResponse(message, HttpStatus.CONFLICT);
 
         return new ResponseEntity<>(er, er.getStatus());
     }
-
-    @ExceptionHandler(JWTException.class)
-    public ResponseEntity<?> handleJWTException(JWTException je){
-        ErrorResponse er = new ErrorResponse(je.getMessage(), je.getStatus());
-
-        return new ResponseEntity<>(er, er.getStatus());
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<?> handleUserNotFound(UserNotFoundException unfe){
-        ErrorResponse er = new ErrorResponse(unfe.getMessage(), unfe.getStatus());
-
-        return new ResponseEntity<>(er, er.getStatus());
-    }
-
-    @ExceptionHandler(BusinessCreationException.class)
-    public ResponseEntity<?> handleBusinessCreationException(BusinessCreationException bce){
-        ErrorResponse er = new ErrorResponse(bce.getMessage(), bce.getStatus());
-
-        return new ResponseEntity<>(er, er.getStatus());
-    }
-
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<?> handleBusinessCreationException(BusinessException be){
-        ErrorResponse er = new ErrorResponse(be.getMessage(), be.getStatus());
-
-        return new ResponseEntity<>(er, er.getStatus());
-    }
-
-    @ExceptionHandler(ServiceNotFoundException.class)
-    public ResponseEntity<?> handleBusinessCreationException(ServiceNotFoundException be){
-        ErrorResponse er = new ErrorResponse(be.getMessage(), be.getStatus());
-
-        return new ResponseEntity<>(er, er.getStatus());
-    }
-
-
-
-
-
 
 }

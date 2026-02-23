@@ -1,11 +1,13 @@
 package com.example.appointments_app.model;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class AppointmentDTO {
     private Long id;
-    private LocalDateTime time;
+    private LocalTime time;
     private ServiceDTO service;
+    private UserDTO user;
 
     public AppointmentDTO(){}
 
@@ -18,11 +20,11 @@ public class AppointmentDTO {
         this.id = id;
     }
 
-    public LocalDateTime getTime() {
+    public LocalTime getTime() {
         return time;
     }
 
-    public void setTime(LocalDateTime time) {
+    public void setTime(LocalTime time) {
         this.time = time;
     }
 
@@ -32,5 +34,13 @@ public class AppointmentDTO {
 
     public void setService(ServiceDTO service) {
         this.service = service;
+    }
+
+    public UserDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserDTO user) {
+        this.user = user;
     }
 }

@@ -2,15 +2,10 @@ package com.example.appointments_app.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class ServiceNotFoundException extends RuntimeException{
-    private String message;
-    private final HttpStatus status = HttpStatus.NOT_FOUND;
+public class ServiceNotFoundException extends BaseException {
 
     public ServiceNotFoundException(String message) {
-        super(message);
+        super(message, HttpStatus.NOT_FOUND);
     }
 
-    public HttpStatus getStatus() {
-        return status;
-    }
 }

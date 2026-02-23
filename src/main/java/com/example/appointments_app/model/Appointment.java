@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.ManyToAny;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 
 @Entity
@@ -14,12 +15,7 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private LocalDateTime time;
-
-    @ManyToOne
-    @JoinColumn(name = "businessId")
-    private Business business;
+    private LocalTime time;
 
     @ManyToOne
     @JoinColumn(name="service_id")
@@ -30,6 +26,10 @@ public class Appointment {
     private User user;
 
     private String status;
+
+    @ManyToOne
+    @JoinColumn(name = "schedule_id")
+    private Schedule schedule;
 
     public Appointment() {
     }
@@ -42,12 +42,12 @@ public class Appointment {
         this.id = id;
     }
 
-    public Business getBusiness() {
-        return business;
+    public Schedule getSchedule() {
+        return schedule;
     }
 
-    public void setBusiness(Business business) {
-        this.business = business;
+    public void setSchedule(Schedule schedule) {
+        this.schedule = schedule;
     }
 
     public User getUser() {
@@ -75,11 +75,11 @@ public class Appointment {
     }
 
 
-    public LocalDateTime getTime() {
+    public LocalTime getTime() {
         return time;
     }
 
-    public void setTime(LocalDateTime time) {
+    public void setTime(LocalTime time) {
         this.time = time;
     }
 
@@ -89,6 +89,7 @@ public class Appointment {
         dto.setId(this.id);
         dto.setTime(this.time);
         dto.setService(this.service.convertToDTO());
+        dto.setUser(this.user.convertToUserDTO());
 
         return dto;
     }
