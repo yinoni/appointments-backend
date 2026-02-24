@@ -54,6 +54,8 @@ public class AppointmentService {
 
         app = appointmentRepo.save(app);
 
+        boolean newCustomer = appointmentRepo.existsByCustomerPhone(appointmentIn.getPhone());
+
         event = new AppointmentEventDTO(
                 schedule.getBusiness().getId(),
                 app.getId(),
@@ -62,7 +64,8 @@ public class AppointmentService {
                 app.getService().getPrice(),
                 LocalDateTime.of(schedule.getDate(), app.getTime()),
                 "CREATED",
-                user.getPhoneNumber()
+                user.getPhoneNumber(),
+                newCustomer
         );
 
         appointmentProducer.sendAppointmentEvent(event);

@@ -12,6 +12,7 @@ public class AppointmentIndex {
     private LocalDateTime timeCreated;
     private String status;
     private Double servicePrice;
+    private boolean firstTimeCustomer;
 
     public AppointmentIndex() {
     }
@@ -63,5 +64,13 @@ public class AppointmentIndex {
 
     public void setServicePrice(Double servicePrice) {
         this.servicePrice = servicePrice;
+    }
+
+    public boolean getFirstTimeCustomer() {
+        return firstTimeCustomer;
+    }
+
+    public void setFirstTimeCustomer(boolean setFirstTimeCustomer) {
+        this.firstTimeCustomer = setFirstTimeCustomer;
     }
 }

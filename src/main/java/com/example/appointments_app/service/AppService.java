@@ -4,6 +4,7 @@ import com.example.appointments_app.elasticsearch.ElasticSearchService;
 import com.example.appointments_app.exception.ScheduleNotFoundException;
 import com.example.appointments_app.model.*;
 import com.example.appointments_app.model.ScreensDTO.HomeDTO;
+import com.example.appointments_app.model.ScreensDTO.InsightsDTO;
 import com.example.appointments_app.model.data_aggregation.RevenueData;
 import com.example.appointments_app.repo.AppointmentRepo;
 import org.slf4j.Logger;
@@ -25,16 +26,17 @@ public class AppService {
     private final BusinessService businessService;
     @Lazy
     private final AppointmentRepo appointmentRepo;
-    private final ElasticSearchService esService;
+
+    private final AnalyticsService analyticsService;
 
     public AppService(AuthService authService,
                          BusinessService businessService,
                       AppointmentRepo appointmentRepo,
-                      ElasticSearchService esService) {
+                      AnalyticsService analyticsService) {
         this.authService = authService;
         this.businessService = businessService;
         this.appointmentRepo = appointmentRepo;
-        this.esService = esService;
+        this.analyticsService = analyticsService;
     }
 
     public HomeDTO getHomePageDTO(Long userId){
@@ -48,7 +50,7 @@ public class AppService {
         }
         Long businessId = businesses.get(0).getId();
 
-        revenueDataList = esService.getRevenueAnalytics(businessId, "7_DAYS");
+        revenueDataList = analyticsService.getRevenueAnalytics(businessId, "7_DAYS");
 
 
         try{
@@ -61,5 +63,10 @@ public class AppService {
         }
 
         return new HomeDTO(businesses, appointmentDTOS, revenueDataList);
+    }
+
+    public InsightsDTO getInsightsPageDTO(Long ownerId, Long businessId, String userSelection){
+        Business business = businessService.findBusinessByIdAndOwnerId(businessId, ownerId);
+        return analyticsService.getInsightsPageData(businessId, userSelection);
     }
 }

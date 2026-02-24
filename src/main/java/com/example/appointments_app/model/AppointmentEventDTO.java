@@ -19,6 +19,8 @@ public class AppointmentEventDTO implements Serializable {
     // Metadata - קריטי לניהול האירוע
     private String eventType; // למשל: "CREATED", "CANCELLED", "UPDATED"
 
+    private boolean newCustomer;
+
 
     public AppointmentEventDTO(Long businessId,
                                Long appointmentId,
@@ -27,7 +29,8 @@ public class AppointmentEventDTO implements Serializable {
                                Double price,
                                LocalDateTime appointmentDate,
                                String eventType,
-                               String phoneNumber) {
+                               String phoneNumber,
+                               boolean newCustomer) {
         this.businessId = businessId;
         this.appointmentId = appointmentId;
         this.businessName = businessName;
@@ -36,6 +39,7 @@ public class AppointmentEventDTO implements Serializable {
         this.appointmentDate = appointmentDate;
         this.eventType = eventType;
         this.phoneNumber = phoneNumber;
+        this.newCustomer = newCustomer;
     }
 
     public Long getBusinessId() {
@@ -102,6 +106,14 @@ public class AppointmentEventDTO implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
+    public boolean isNewCustomer() {
+        return newCustomer;
+    }
+
+    public void setNewCustomer(boolean newCustomer) {
+        this.newCustomer = newCustomer;
+    }
+
     public AppointmentIndex toIndex(){
         AppointmentIndex index = new AppointmentIndex();
         index.setBusinessId(this.businessId);
@@ -110,6 +122,7 @@ public class AppointmentEventDTO implements Serializable {
         index.setServicePrice(this.price);
         index.setTimeCreated(this.appointmentDate);
         index.setStatus(this.eventType);
+        index.setFirstTimeCustomer(this.newCustomer);
 
         return index;
     }

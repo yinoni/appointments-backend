@@ -6,7 +6,7 @@ import java.util.List;
 
 public class InsightsDTO {
     private List<RevenueData> revenueDataList;
-    private int bookings;
+    private long bookings;
     private int new_customers;
     private double rating;
 
@@ -28,11 +28,11 @@ public class InsightsDTO {
         this.revenueDataList = revenueDataList;
     }
 
-    public int getBookings() {
+    public long getBookings() {
         return bookings;
     }
 
-    public void setBookings(int bookings) {
+    public void setBookings(long bookings) {
         this.bookings = bookings;
     }
 
@@ -51,4 +51,6 @@ public class InsightsDTO {
     public void setRating(double rating) {
         this.rating = rating;
     }
+
+
 }
