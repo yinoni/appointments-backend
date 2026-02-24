@@ -1,13 +1,13 @@
 package com.example.appointments_app.model.data_aggregation;
 
-public class WeeklyRevenueData {
+public class RevenueData {
     private String date;
     private Double sum;
 
-    public WeeklyRevenueData() {
+    public RevenueData() {
     }
 
-    public WeeklyRevenueData(String date, Double sum) {
+    public RevenueData(String date, Double sum) {
         this.date = date;
         this.sum = sum;
     }

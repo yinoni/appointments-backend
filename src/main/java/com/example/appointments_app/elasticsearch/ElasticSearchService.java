@@ -1,7 +1,9 @@
 package com.example.appointments_app.elasticsearch;
 
-import com.example.appointments_app.model.data_aggregation.WeeklyRevenueData;
+import com.example.appointments_app.model.data_aggregation.RevenueData;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -9,15 +11,26 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ElasticSearchService {
+    private static final Logger log = LoggerFactory.getLogger(ElasticSearchService.class);
     private final OkHttpClient client = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String ELASTIC_URL = "http://localhost:9200";
 
-    // פונקציה להכנסת נתונים (Index)
+
+    public record AnalyticsConfig(String range, String interval) {}
+
+    /***
+     *
+     * @param index - The index we want to insert
+     * @param id - The id
+     * @param data - The data
+     * @return - The response as String
+     * @throws IOException
+     */
     public String indexDocument(String index, String id, Object data) throws IOException {
         String json = objectMapper.writeValueAsString(data);
 
@@ -34,6 +47,12 @@ public class ElasticSearchService {
         }
     }
 
+    /***
+     *
+     * @param index - The index in the elasticsearch (If we want elasticsearch to give the document ID)
+     * @param data - The data to insert into the index
+     * @throws IOException
+     */
     public void insertDocument(String index, Object data) throws IOException {
         String json = objectMapper.writeValueAsString(data);
 
@@ -54,7 +73,13 @@ public class ElasticSearchService {
         }
     }
 
-    // פונקציה לחיפוש פשוט
+    /***
+     *
+     * @param index - The index in the elasticsearch
+     * @param query - The query for the search
+     * @return - The search result as String
+     * @throws IOException
+     */
     public String search(String index, String query) throws IOException {
         Request request = new Request.Builder()
                 .url(ELASTIC_URL + "/" + index + "/_search?q=" + query)
@@ -66,81 +91,31 @@ public class ElasticSearchService {
         }
     }
 
-    public List<WeeklyRevenueData> getWeeklyRevenue(Long businessId) throws IOException {
-        String pipeline = """
-        {
-          "size": 0, 
-          "query": {
-            "bool": {
-              "filter": [
-                { "term": { "businessId": %d } },
-                { "range": { "timeCreated": { "gte": "now-7d/d", "lte": "now/d" } } }
-              ]
-            }
-          },
-          "aggs": {
-            "revenue_over_time": {
-              "date_histogram": {
-                "field": "timeCreated",
-                "fixed_interval": "1d",
-                "format": "yyyy-MM-dd",
-                "extended_bounds": {
-                  "min": "now-7d/d",
-                  "max": "now/d"
-                }
-              },
-              "aggs": {
-                "daily_revenue": {
-                  "sum": { "field": "servicePrice" }
-                }
-              }
-            }
-          }
-        }
-    """;
-        String finalPipeline = String.format(pipeline, businessId);
+    /***
+     *
+     * @param index - The index in the elasticsearch
+     * @param pipeline - The aggregation pipeline
+     * @return - The aggregation result as string
+     */
+    public String aggregate(String index, String pipeline){
 
         RequestBody body = RequestBody.create(
-                finalPipeline, MediaType.parse("application/json; charset=utf-8"));
+                pipeline, MediaType.parse("application/json; charset=utf-8"));
 
         Request request = new Request.Builder()
-                .url(ELASTIC_URL + "/appointments_history" + "/_search")
+                .url(ELASTIC_URL + "/" + index + "/_search")
                 .post(body)
                 .build();
 
-        try (Response res = client.newCall(request).execute()) {
-            if (!res.isSuccessful()) {
-                System.err.println("Failed to insert to Elastic: " + res.code() + " " + res.message());
-            } else {
-                String resBody = res.body().string();
-                return this.getWeeklyRevenue(resBody);
+        try(Response res = client.newCall(request).execute()){
+            if (res.isSuccessful() && res.body() != null) {
+                return res.body().string();
             }
+
+        } catch (IOException e) {
+            log.info(e.getMessage());
         }
 
-        return new ArrayList<>();
-
+        return "{}";
     }
-
-
-    private List<WeeklyRevenueData> getWeeklyRevenue(String data){
-        List<WeeklyRevenueData> revenueDataList = new ArrayList<>();
-        JsonNode root = objectMapper.readTree(data);
-
-        JsonNode buckets = root.path("aggregations")
-                .path("revenue_over_time")
-                .path("buckets");
-
-        if (buckets.isArray()) {
-            for (JsonNode bucket : buckets) {
-                String date = bucket.path("key_as_string").asText();
-                double amount = bucket.path("daily_revenue").path("value").asDouble();
-
-                revenueDataList.add(new WeeklyRevenueData(date, amount));
-            }
-        }
-
-        return revenueDataList;
-    }
-
-
 }

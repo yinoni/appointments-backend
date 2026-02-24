@@ -1,11 +1,9 @@
 package com.example.appointments_app.controller;
 
 import com.example.appointments_app.model.CustomUserDetails;
-import com.example.appointments_app.model.HomeDTO;
-import com.example.appointments_app.redis.Redis;
+import com.example.appointments_app.model.ScreensDTO.HomeDTO;
+import com.example.appointments_app.model.ScreensDTO.InsightsDTO;
 import com.example.appointments_app.service.AppService;
-import com.example.appointments_app.service.AuthService;
-import com.example.appointments_app.service.BusinessService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +25,8 @@ public class AppController {
     }
 
     @GetMapping("/analytics")
-    public ResponseEntity<?> getAnalytics(@AuthenticationPrincipal CustomUserDetails ownerDetails){
-        HomeDTO homeDTO = appService.getHomePageDTO(ownerDetails.getId());
-        return ResponseEntity.ok(homeDTO);
+    public ResponseEntity<?> getAnalytics(@AuthenticationPrincipal CustomUserDetails ownerDetails, @RequestParam String range){
+        InsightsDTO insightsDTO = appService.getInsightsPageDTO(ownerDetails.getId(), 9L, range);
+        return ResponseEntity.ok(insightsDTO);
     }
 }

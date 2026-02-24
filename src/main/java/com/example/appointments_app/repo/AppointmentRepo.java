@@ -13,6 +13,9 @@ import java.util.List;
 
 public interface AppointmentRepo extends CrudRepository<Appointment, Long> {
 
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END FROM Appointment a WHERE a.user.phoneNumber = :phone")
+    boolean existsByCustomerPhone(@Param("phone") String phone);
+
     @Modifying
     @Transactional
     @Query("UPDATE Appointment a SET a.service = null WHERE a.service.id = :serviceId")
