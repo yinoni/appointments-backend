@@ -166,6 +166,12 @@ public class AnalyticsService {
                 .build();
     }
 
+    /***
+     *
+     * @param businessId - The business id
+     * @param range - The range (for example: the past30 days)
+     * @return - The best performing services for the business with id = {businessId}
+     */
     public List<ServicePerformanceDTO> getBestServicePerformances(Long businessId, String range){
         String pipeline = """
                 {
