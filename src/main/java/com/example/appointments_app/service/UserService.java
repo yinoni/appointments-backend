@@ -2,10 +2,12 @@ package com.example.appointments_app.service;
 
 import com.example.appointments_app.exception.AuthenticationException;
 import com.example.appointments_app.kafka.UserProducer;
-import com.example.appointments_app.model.*;
+import com.example.appointments_app.model.authentication.CustomUserDetails;
+import com.example.appointments_app.model.user.User;
+import com.example.appointments_app.model.user.UserEventDTO;
+import com.example.appointments_app.model.user.UserIn;
 import com.example.appointments_app.repo.UserRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;

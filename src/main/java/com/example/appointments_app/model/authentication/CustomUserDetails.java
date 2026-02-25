@@ -1,4 +1,4 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.authentication;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;

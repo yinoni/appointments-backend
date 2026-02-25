@@ -1,4 +1,4 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.authentication;
 
 public final class AuthRequestBuilder {
     private String email;

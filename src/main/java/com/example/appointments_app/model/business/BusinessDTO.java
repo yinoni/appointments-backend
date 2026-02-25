@@ -1,7 +1,9 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.business;
+
+import com.example.appointments_app.model.service.ServiceDTO;
+import com.example.appointments_app.model.user.UserDTO;
 
 import java.util.List;
-import java.util.Set;
 
 public class BusinessDTO {
     private Long id;
@@ -11,6 +13,9 @@ public class BusinessDTO {
     private UserDTO owner;
     private Integer totalAppointments;
     private List<ServiceDTO> services;
+    private Double rating;
+    private String tagline;
+    private String category;
 
 
     public BusinessDTO(){}
@@ -70,5 +75,29 @@ public class BusinessDTO {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
+
+    public String getTagline() {
+        return tagline;
+    }
+
+    public void setTagline(String tagline) {
+        this.tagline = tagline;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

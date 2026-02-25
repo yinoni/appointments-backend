@@ -1,8 +1,9 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.schedule;
 
+import com.example.appointments_app.model.appointment.Appointment;
+import com.example.appointments_app.model.business.Business;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

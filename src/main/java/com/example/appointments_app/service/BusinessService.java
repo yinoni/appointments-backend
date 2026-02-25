@@ -3,23 +3,26 @@ package com.example.appointments_app.service;
 import com.example.appointments_app.elasticsearch.ElasticSearchService;
 import com.example.appointments_app.exception.*;
 import com.example.appointments_app.kafka.BusinessProducer;
-import com.example.appointments_app.model.*;
-import com.example.appointments_app.redis.Redis;
+import com.example.appointments_app.model.business.Business;
+import com.example.appointments_app.model.business.BusinessCategory;
+import com.example.appointments_app.model.business.BusinessDTO;
+import com.example.appointments_app.model.business.BusinessInput;
+import com.example.appointments_app.model.schedule.Schedule;
+import com.example.appointments_app.model.schedule.ScheduleDTO;
+import com.example.appointments_app.model.schedule.ScheduleIn;
+import com.example.appointments_app.model.user.User;
 import com.example.appointments_app.repo.AppointmentRepo;
 import com.example.appointments_app.repo.BusinessRepo;
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static com.example.appointments_app.model.AppointmentBuilder.anAppointment;
+import static com.example.appointments_app.model.business.BusinessBuilder.aBusiness;
 
 @Service
 public class BusinessService {
@@ -81,9 +84,6 @@ public class BusinessService {
 
         Business business = businessInput.toBusiness();
         business.setOwner(user);
-        business.setTotalAppointments(0);
-        business.setSchedules(new ArrayList<>());
-        business.setServices(new ArrayList<>());
 
         bDTO = save(business).convertToDTO();
 

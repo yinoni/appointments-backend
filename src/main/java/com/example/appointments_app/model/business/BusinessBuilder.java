@@ -1,4 +1,10 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.business;
+
+import com.example.appointments_app.model.schedule.Schedule;
+import com.example.appointments_app.model.service.Service;
+import com.example.appointments_app.model.user.User;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 import java.util.List;
 
@@ -12,6 +18,10 @@ public final class BusinessBuilder {
     private String description;
     private String city;
     private String street;
+    private @Min(1)
+    @Max(5) Double rating;
+    private String tagline;
+    private BusinessCategory category;
 
     private BusinessBuilder() {
     }
@@ -65,6 +75,21 @@ public final class BusinessBuilder {
         return this;
     }
 
+    public BusinessBuilder withRating(Double rating) {
+        this.rating = rating;
+        return this;
+    }
+
+    public BusinessBuilder withTagline(String tagline) {
+        this.tagline = tagline;
+        return this;
+    }
+
+    public BusinessBuilder withCategory(BusinessCategory category) {
+        this.category = category;
+        return this;
+    }
+
     public Business build() {
         Business business = new Business();
         business.setId(id);
@@ -76,6 +101,9 @@ public final class BusinessBuilder {
         business.setDescription(description);
         business.setCity(city);
         business.setStreet(street);
+        business.setRating(rating);
+        business.setTagline(tagline);
+        business.setCategory(category);
         return business;
     }
 }

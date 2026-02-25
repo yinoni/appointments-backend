@@ -1,17 +1,13 @@
 package com.example.appointments_app.oauth2;
 
 import com.example.appointments_app.jwt.JwtService;
-import com.example.appointments_app.model.CustomUserDetails;
-import com.example.appointments_app.model.User;
-import com.example.appointments_app.model.UserIn;
+import com.example.appointments_app.model.authentication.CustomUserDetails;
+import com.example.appointments_app.model.user.User;
 import com.example.appointments_app.repo.UserRepository;
-import com.example.appointments_app.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -19,9 +15,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.UUID;
 
 @Component

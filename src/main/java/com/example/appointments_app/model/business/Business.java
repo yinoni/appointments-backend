@@ -1,12 +1,15 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.business;
 
+import com.example.appointments_app.model.schedule.Schedule;
+import com.example.appointments_app.model.schedule.ScheduleDTO;
+import com.example.appointments_app.model.service.Service;
+import com.example.appointments_app.model.service.ServiceDTO;
+import com.example.appointments_app.model.user.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name="businesses")
@@ -39,6 +42,18 @@ public class Business {
 
     @Column(nullable = false, name = "street", columnDefinition = "varchar(255) default 'N/A'")
     private String street;
+
+    @Column(nullable = false, name = "rating")
+    @Min(1)
+    @Max(5)
+    private Double rating;
+
+    @Column(nullable = false, name = "tagline")
+    private String tagline;
+
+    @Enumerated(EnumType.STRING) // זה מה שיוצר את עמודת ה-VARCHAR ב-DB
+    @Column(name = "category", length = 50) // כדאי להגביל אורך לביצועים
+    private BusinessCategory category;
 
 
     public Business() {
@@ -121,6 +136,30 @@ public class Business {
         this.street = street;
     }
 
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
+
+    public String getTagline() {
+        return tagline;
+    }
+
+    public void setTagline(String tagline) {
+        this.tagline = tagline;
+    }
+
+    public BusinessCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(BusinessCategory category) {
+        this.category = category;
+    }
+
     public BusinessDTO convertToDTO(){
         BusinessDTO dto = new BusinessDTO();
         List<ServiceDTO> services = this.services.stream().map(Service::convertToDTO).toList();
@@ -133,6 +172,9 @@ public class Business {
         dto.setOwner(this.owner.convertToUserDTO());
         dto.setTotalAppointments(this.totalAppointments);
         dto.setServices(services);
+        dto.setRating(this.rating);
+        dto.setTagline(this.tagline);
+        dto.setCategory(this.category.getDisplayName());
 
         return dto;
     }

@@ -1,4 +1,4 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.service;
 
 public class ServiceRemoveRequest {
     private Long serviceId;

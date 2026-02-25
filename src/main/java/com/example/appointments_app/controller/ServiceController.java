@@ -1,6 +1,9 @@
 package com.example.appointments_app.controller;
 
-import com.example.appointments_app.model.*;
+import com.example.appointments_app.model.authentication.CustomUserDetails;
+import com.example.appointments_app.model.service.ServiceDTO;
+import com.example.appointments_app.model.service.ServiceIn;
+import com.example.appointments_app.model.service.ServiceRemoveRequest;
 import com.example.appointments_app.service.ServiceService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

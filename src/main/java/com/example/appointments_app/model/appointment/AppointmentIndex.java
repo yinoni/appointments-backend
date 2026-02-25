@@ -1,4 +1,4 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.appointment;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -8,6 +8,7 @@ public class AppointmentIndex {
     private Long businessId;
     private String businessName;
     private Long serviceId;
+    private String serviceName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime timeCreated;
     private String status;
@@ -72,5 +73,17 @@ public class AppointmentIndex {
 
     public void setFirstTimeCustomer(boolean setFirstTimeCustomer) {
         this.firstTimeCustomer = setFirstTimeCustomer;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public boolean isFirstTimeCustomer() {
+        return firstTimeCustomer;
     }
 }

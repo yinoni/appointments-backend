@@ -1,4 +1,4 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.schedule;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.AssertTrue;
@@ -6,13 +6,11 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.appointments_app.model.ScheduleBuilder.aSchedule;
+import static com.example.appointments_app.model.schedule.ScheduleBuilder.aSchedule;
 
 public class ScheduleIn {
 

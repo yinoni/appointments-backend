@@ -3,6 +3,7 @@ package com.example.appointments_app.service;
 import com.example.appointments_app.elasticsearch.ElasticSearchService;
 import com.example.appointments_app.model.ScreensDTO.InsightsDTO;
 import com.example.appointments_app.model.data_aggregation.RevenueData;
+import com.example.appointments_app.model.data_aggregation.ServicePerformanceDTO;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -155,11 +156,63 @@ public class AnalyticsService {
         long total_bookings = root.path("hits").path("total").path("value").asLong();
         int total_new_customers = root.path("aggregations").path("count_new_customers").path("doc_count").asInt();
 
+        List<ServicePerformanceDTO> services_performance = getBestServicePerformances(businessId, analyticsConfig.range);
+
         return anInsightsDTO().withRevenueDataList(revenueDataList)
                 .withBookings(total_bookings)
                 .withNew_customers(total_new_customers)
                 .withRating(4.9)
+                .withServicesPerformance(services_performance)
                 .build();
+    }
+
+    public List<ServicePerformanceDTO> getBestServicePerformances(Long businessId, String range){
+        String pipeline = """
+                {
+                   "size": 0,
+                   "query": {
+                     "bool": {
+                       "filter": [
+                         { "term": { "businessId": %d } },
+                         { "range": { "timeCreated": { "gte": "%s" } } }
+                       ]
+                     }
+                   },
+                   "aggs": {
+                     "bookings_by_service_name": {
+                       "terms": {
+                         "field": "serviceName.keyword"
+                       },
+                       "aggs": {
+                        "total_revenue": {
+                            "sum": {"field": "servicePrice"}
+                        }
+                     }
+                     }
+                   }
+                 }
+                
+                """;
+
+        String finalPipeline = String.format(pipeline, businessId, range);
+
+        String response = elasticSearchService.aggregate("appointments_history", finalPipeline);
+
+        List<ServicePerformanceDTO> services_performance = new ArrayList<>();
+
+        JsonNode root = om.readTree(response);
+        JsonNode buckets = root.path("aggregations").path("bookings_by_service_name").path("buckets");
+
+        if(buckets.isArray()){
+            for(JsonNode bucket : buckets){
+                String serviceName = bucket.path("key").asString();
+                int bookings = bucket.path("doc_count").asInt();
+                double total_revenue = bucket.path("total_revenue"). path("value").asDouble();
+                services_performance.add(new ServicePerformanceDTO(serviceName, bookings, total_revenue));
+            }
+        }
+
+       return services_performance;
     }
 
 }

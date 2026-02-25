@@ -1,6 +1,8 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.business;
 
-import static com.example.appointments_app.model.BusinessBuilder.aBusiness;
+import java.util.ArrayList;
+
+import static com.example.appointments_app.model.business.BusinessBuilder.aBusiness;
 
 public class BusinessInput {
 
@@ -8,6 +10,8 @@ public class BusinessInput {
     private String businessDesc;
     private String city;
     private String street;
+    private String category;
+    private String tagline;
 
     public String getBusinessName() {
         return businessName;
@@ -41,12 +45,34 @@ public class BusinessInput {
         this.street = street;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getTagline() {
+        return tagline;
+    }
+
+    public void setTagline(String tagline) {
+        this.tagline = tagline;
+    }
+
     public Business toBusiness() {
         return aBusiness()
                 .withBusinessName(this.businessName)
                 .withDescription(this.businessDesc)
                 .withCity(this.city)
                 .withStreet(this.street)
+                .withCategory(BusinessCategory.fromString(this.category.toUpperCase()))
+                .withTotalAppointments(0)
+                .withSchedules(new ArrayList<>())
+                .withServices(new ArrayList<>())
+                .withRating(2.5)
+                .withTagline(this.tagline)
                 .build();
     }
 }

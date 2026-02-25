@@ -2,17 +2,17 @@ package com.example.appointments_app.service;
 
 import com.example.appointments_app.exception.AppointmentAlreadyExistsException;
 import com.example.appointments_app.exception.BusinessException;
-import com.example.appointments_app.exception.ServiceNotFoundException;
 import com.example.appointments_app.kafka.AppointmentProducer;
-import com.example.appointments_app.model.*;
+import com.example.appointments_app.model.appointment.Appointment;
+import com.example.appointments_app.model.appointment.AppointmentEventDTO;
+import com.example.appointments_app.model.appointment.AppointmentIn;
+import com.example.appointments_app.model.schedule.Schedule;
+import com.example.appointments_app.model.user.User;
 import com.example.appointments_app.repo.AppointmentRepo;
 import org.springframework.http.HttpStatus;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
 
 @Service
 public class AppointmentService {
@@ -38,7 +38,7 @@ public class AppointmentService {
     public Appointment insertAppointment(AppointmentIn appointmentIn) {
         Appointment app = appointmentIn.toAppointment();
         Schedule schedule = scheduleService.findById(appointmentIn.getScheduleId());
-        com.example.appointments_app.model.Service service = serviceService.findById(appointmentIn.getServiceId());
+        com.example.appointments_app.model.service.Service service = serviceService.findById(appointmentIn.getServiceId());
         User user = userService.findByPhone(appointmentIn.getPhone());
         AppointmentEventDTO event;
 
@@ -65,7 +65,8 @@ public class AppointmentService {
                 LocalDateTime.of(schedule.getDate(), app.getTime()),
                 "CREATED",
                 user.getPhoneNumber(),
-                newCustomer
+                newCustomer,
+                service.getServiceName()
         );
 
         appointmentProducer.sendAppointmentEvent(event);

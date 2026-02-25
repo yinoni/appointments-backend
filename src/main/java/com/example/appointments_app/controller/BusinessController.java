@@ -1,9 +1,12 @@
 package com.example.appointments_app.controller;
 
-import com.example.appointments_app.model.*;
+import com.example.appointments_app.model.authentication.CustomUserDetails;
+import com.example.appointments_app.model.business.BusinessDTO;
+import com.example.appointments_app.model.business.BusinessInput;
+import com.example.appointments_app.model.schedule.ScheduleDTO;
+import com.example.appointments_app.model.schedule.ScheduleIn;
 import com.example.appointments_app.service.BusinessService;
 import com.example.appointments_app.service.ScheduleService;
-import com.example.appointments_app.util.DateUtils;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -12,10 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
-
-import static com.example.appointments_app.util.DateUtils.getDateLocalDate;
 
 @RestController
 @RequestMapping("/business")
@@ -30,7 +30,7 @@ public class BusinessController {
     }
 
     @PutMapping("/{businessId}")
-    public ResponseEntity<?> updateBusiness(@PathVariable Long businessId,@AuthenticationPrincipal CustomUserDetails currentUser,@RequestBody BusinessInput businessInput){
+    public ResponseEntity<?> updateBusiness(@PathVariable Long businessId, @AuthenticationPrincipal CustomUserDetails currentUser, @RequestBody BusinessInput businessInput){
         BusinessDTO dto = businessService.updateBusiness(businessId, currentUser.getId(), businessInput).convertToDTO();
 
         return ResponseEntity.ok(dto);
@@ -44,7 +44,7 @@ public class BusinessController {
      * @return - This function create new business with the business data from the request body
      */
     @PostMapping("")
-    public ResponseEntity<?> createBusiness(@RequestBody BusinessInput businessInput, @AuthenticationPrincipal CustomUserDetails currentUser){
+    public ResponseEntity<?> createBusiness(@Valid @RequestBody BusinessInput businessInput, @AuthenticationPrincipal CustomUserDetails currentUser){
         BusinessDTO businessDTO = businessService.createBusiness(businessInput, currentUser.getId());
         return new ResponseEntity<>(businessDTO, HttpStatus.OK);
     }

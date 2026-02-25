@@ -1,8 +1,8 @@
 package com.example.appointments_app.kafka;
 
 import com.example.appointments_app.elasticsearch.ElasticSearchService;
-import com.example.appointments_app.model.*;
-import com.example.appointments_app.repo.AppointmentRepo;
+import com.example.appointments_app.model.appointment.AppointmentEventDTO;
+import com.example.appointments_app.model.appointment.AppointmentIndex;
 import com.example.appointments_app.service.SmsService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;

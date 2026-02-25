@@ -1,4 +1,6 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.service;
+
+import com.example.appointments_app.model.business.Business;
 
 public final class ServiceBuilder {
     private Long id;

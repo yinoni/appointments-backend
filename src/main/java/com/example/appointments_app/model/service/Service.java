@@ -1,5 +1,6 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.service;
 
+import com.example.appointments_app.model.business.Business;
 import jakarta.persistence.*;
 
 import java.util.Objects;

@@ -1,11 +1,8 @@
 package com.example.appointments_app.controller;
 
-import com.example.appointments_app.exception.AppointmentAlreadyExistsException;
-import com.example.appointments_app.model.*;
+import com.example.appointments_app.model.appointment.AppointmentDTO;
+import com.example.appointments_app.model.appointment.AppointmentIn;
 import com.example.appointments_app.service.AppointmentService;
-import com.example.appointments_app.service.ScheduleService;
-import com.example.appointments_app.service.ServiceService;
-import com.example.appointments_app.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

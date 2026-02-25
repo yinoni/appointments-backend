@@ -1,6 +1,6 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.user;
 
-import jakarta.annotation.Nullable;
+import com.example.appointments_app.model.business.Business;
 import jakarta.persistence.*;
 
 import java.util.Set;

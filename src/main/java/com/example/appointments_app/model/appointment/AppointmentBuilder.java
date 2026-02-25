@@ -1,4 +1,8 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.appointment;
+
+import com.example.appointments_app.model.schedule.Schedule;
+import com.example.appointments_app.model.service.Service;
+import com.example.appointments_app.model.user.User;
 
 import java.time.LocalTime;
 
