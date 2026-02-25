@@ -1,6 +1,6 @@
 package com.example.appointments_app.kafka;
 
-import com.example.appointments_app.model.UserEventDTO;
+import com.example.appointments_app.model.user.UserEventDTO;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;

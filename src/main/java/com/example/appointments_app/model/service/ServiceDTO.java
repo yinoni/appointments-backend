@@ -1,19 +1,20 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.service;
 
-import static com.example.appointments_app.model.ServiceBuilder.aService;
-
-public class ServiceIn {
-    private Long businessId;
+public class ServiceDTO {
+    private Long id;
     private String serviceName;
     private Double price;
     private Integer duration;
 
-    public Long getBusinessId() {
-        return businessId;
+
+    public ServiceDTO(){}
+
+    public Long getId() {
+        return id;
     }
 
-    public void setBusinessId(Long businessId) {
-        this.businessId = businessId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getServiceName() {
@@ -39,12 +40,5 @@ public class ServiceIn {
     public void setDuration(Integer duration) {
         this.duration = duration;
     }
-
-    public Service toService(){
-        return aService()
-                .withDuration(this.duration)
-                .withPrice(this.price)
-                .withServiceName(this.serviceName)
-                .build();
-    }
 }
+

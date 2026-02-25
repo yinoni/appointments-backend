@@ -1,12 +1,10 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.appointment;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 
-import static com.example.appointments_app.model.AppointmentBuilder.anAppointment;
+import static com.example.appointments_app.model.appointment.AppointmentBuilder.anAppointment;
 
 public class AppointmentIn {
     private Long serviceId;

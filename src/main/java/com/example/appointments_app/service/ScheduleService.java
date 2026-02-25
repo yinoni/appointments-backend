@@ -1,21 +1,17 @@
 package com.example.appointments_app.service;
 
-import com.example.appointments_app.exception.BusinessException;
 import com.example.appointments_app.exception.ScheduleNotFoundException;
-import com.example.appointments_app.model.*;
+import com.example.appointments_app.model.schedule.Schedule;
 import com.example.appointments_app.redis.Redis;
 import com.example.appointments_app.repo.ScheduleRepo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable; // בשביל הפרמטר
 import org.springframework.data.domain.PageRequest; // בשביל יצירת הבקשה
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

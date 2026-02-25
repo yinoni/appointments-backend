@@ -1,7 +1,6 @@
 package com.example.appointments_app.repo;
 
-import com.example.appointments_app.model.Business;
-import com.example.appointments_app.model.User;
+import com.example.appointments_app.model.business.Business;
 import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;

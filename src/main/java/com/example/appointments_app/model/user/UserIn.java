@@ -1,6 +1,6 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.user;
 
-import static com.example.appointments_app.model.UserBuilder.anUser;
+import static com.example.appointments_app.model.user.UserBuilder.anUser;
 
 public class UserIn {
 

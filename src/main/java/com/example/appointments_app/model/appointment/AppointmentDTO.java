@@ -1,6 +1,8 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.appointment;
 
-import java.time.LocalDateTime;
+import com.example.appointments_app.model.service.ServiceDTO;
+import com.example.appointments_app.model.user.UserDTO;
+
 import java.time.LocalTime;
 
 public class AppointmentDTO {

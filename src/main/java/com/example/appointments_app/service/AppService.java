@@ -1,11 +1,14 @@
 package com.example.appointments_app.service;
 
-import com.example.appointments_app.elasticsearch.ElasticSearchService;
 import com.example.appointments_app.exception.ScheduleNotFoundException;
-import com.example.appointments_app.model.*;
 import com.example.appointments_app.model.ScreensDTO.HomeDTO;
 import com.example.appointments_app.model.ScreensDTO.InsightsDTO;
+import com.example.appointments_app.model.appointment.Appointment;
+import com.example.appointments_app.model.appointment.AppointmentDTO;
+import com.example.appointments_app.model.business.Business;
+import com.example.appointments_app.model.business.BusinessDTO;
 import com.example.appointments_app.model.data_aggregation.RevenueData;
+import com.example.appointments_app.model.schedule.ScheduleDTO;
 import com.example.appointments_app.repo.AppointmentRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

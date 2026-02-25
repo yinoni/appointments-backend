@@ -1,6 +1,6 @@
 package com.example.appointments_app.repo;
 
-import com.example.appointments_app.model.User;
+import com.example.appointments_app.model.user.User;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;

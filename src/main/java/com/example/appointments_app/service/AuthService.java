@@ -1,7 +1,7 @@
 package com.example.appointments_app.service;
 
 import com.example.appointments_app.exception.AuthenticationException;
-import com.example.appointments_app.model.AuthRequest;
+import com.example.appointments_app.model.authentication.AuthRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 

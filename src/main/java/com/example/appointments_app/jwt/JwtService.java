@@ -1,6 +1,6 @@
 package com.example.appointments_app.jwt;
 
-import com.example.appointments_app.model.CustomUserDetails;
+import com.example.appointments_app.model.authentication.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.core.userdetails.UserDetails;

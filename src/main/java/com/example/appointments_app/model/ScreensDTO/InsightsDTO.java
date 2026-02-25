@@ -1,6 +1,7 @@
 package com.example.appointments_app.model.ScreensDTO;
 
 import com.example.appointments_app.model.data_aggregation.RevenueData;
+import com.example.appointments_app.model.data_aggregation.ServicePerformanceDTO;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ public class InsightsDTO {
     private long bookings;
     private int new_customers;
     private double rating;
+    private List<ServicePerformanceDTO> servicesPerformance;
 
     public InsightsDTO() {
     }
@@ -52,5 +54,11 @@ public class InsightsDTO {
         this.rating = rating;
     }
 
+    public List<ServicePerformanceDTO> getServicesPerformance() {
+        return servicesPerformance;
+    }
 
+    public void setServicesPerformance(List<ServicePerformanceDTO> servicesPerformance) {
+        this.servicesPerformance = servicesPerformance;
+    }
 }

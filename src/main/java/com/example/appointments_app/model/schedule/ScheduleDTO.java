@@ -1,4 +1,4 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.schedule;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

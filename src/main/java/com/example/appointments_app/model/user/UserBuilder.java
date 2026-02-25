@@ -1,4 +1,6 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.user;
+
+import com.example.appointments_app.model.business.Business;
 
 import java.util.Set;
 

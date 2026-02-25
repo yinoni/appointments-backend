@@ -1,7 +1,7 @@
 package com.example.appointments_app.model.ScreensDTO;
 
-import com.example.appointments_app.model.AppointmentDTO;
-import com.example.appointments_app.model.BusinessDTO;
+import com.example.appointments_app.model.appointment.AppointmentDTO;
+import com.example.appointments_app.model.business.BusinessDTO;
 import com.example.appointments_app.model.data_aggregation.RevenueData;
 
 import java.util.List;

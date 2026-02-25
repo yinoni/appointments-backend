@@ -2,13 +2,14 @@ package com.example.appointments_app.service;
 
 import com.example.appointments_app.exception.BusinessException;
 import com.example.appointments_app.exception.ServiceNotFoundException;
-import com.example.appointments_app.model.*;
+import com.example.appointments_app.model.business.Business;
+import com.example.appointments_app.model.service.ServiceDTO;
+import com.example.appointments_app.model.service.ServiceIn;
+import com.example.appointments_app.model.service.ServiceRemoveRequest;
 import com.example.appointments_app.repo.ServiceRepo;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalTime;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -23,17 +24,17 @@ public class ServiceService {
     }
 
 
-    public com.example.appointments_app.model.Service findById(Long serviceId) {
+    public com.example.appointments_app.model.service.Service findById(Long serviceId) {
         return serviceRepo.findById(serviceId).orElseThrow(() ->
                 new ServiceNotFoundException("Service not exists!"));
     }
 
-    public com.example.appointments_app.model.Service addNewService(com.example.appointments_app.model.Service service){
+    public com.example.appointments_app.model.service.Service addNewService(com.example.appointments_app.model.service.Service service){
         return serviceRepo.save(service);
     }
 
-    public com.example.appointments_app.model.Service updateService(Long serviceId, ServiceIn serviceIn, Long ownerId){
-        com.example.appointments_app.model.Service service = findById(serviceId);
+    public com.example.appointments_app.model.service.Service updateService(Long serviceId, ServiceIn serviceIn, Long ownerId){
+        com.example.appointments_app.model.service.Service service = findById(serviceId);
 
         if(service.getBusiness().getId() != serviceIn.getBusinessId())
             throw new ServiceNotFoundException("This service is not exists on this business!");
@@ -58,7 +59,7 @@ public class ServiceService {
     public ServiceDTO addNewService(ServiceIn serviceIn, Long ownerId){
         Business business = businessService.findBusinessByIdAndOwnerId(serviceIn.getBusinessId(), ownerId);
 
-        com.example.appointments_app.model.Service service = serviceIn.toService();
+        com.example.appointments_app.model.service.Service service = serviceIn.toService();
 
         service.setBusiness(business);
 
@@ -81,7 +82,7 @@ public class ServiceService {
         // 1. מציאת העסק
         Business business = businessService.findBusinessByIdAndOwnerId(request.getBusinessId(), ownerId);
 
-        com.example.appointments_app.model.Service service = findById(request.getServiceId());
+        com.example.appointments_app.model.service.Service service = findById(request.getServiceId());
 
         // Check if the business id of the service and the business id from the request are equal
         if(!Objects.equals(service.getBusiness().getId(), request.getBusinessId()))

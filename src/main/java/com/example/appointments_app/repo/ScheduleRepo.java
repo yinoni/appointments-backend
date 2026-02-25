@@ -1,16 +1,14 @@
 package com.example.appointments_app.repo;
 
-import com.example.appointments_app.model.Appointment;
-import com.example.appointments_app.model.Schedule;
+import com.example.appointments_app.model.schedule.Schedule;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import org.springframework.data.domain.Page;     // ✅ זה הנכון
 import org.springframework.data.domain.Pageable; // בשביל הפרמטר
-import org.springframework.data.domain.PageRequest; // בשביל יצירת הבקשה
+
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 public interface ScheduleRepo extends CrudRepository<Schedule, Long> {

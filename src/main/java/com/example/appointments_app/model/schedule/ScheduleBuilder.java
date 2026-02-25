@@ -1,5 +1,7 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.schedule;
 
+import com.example.appointments_app.model.appointment.Appointment;
+import com.example.appointments_app.model.business.Business;
 import jakarta.validation.constraints.Min;
 
 import java.time.LocalDate;

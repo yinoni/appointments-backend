@@ -1,6 +1,6 @@
 package com.example.appointments_app.repo;
 
-import com.example.appointments_app.model.Appointment;
+import com.example.appointments_app.model.appointment.Appointment;
 import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -8,8 +8,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-
-import java.util.List;
 
 public interface AppointmentRepo extends CrudRepository<Appointment, Long> {
 

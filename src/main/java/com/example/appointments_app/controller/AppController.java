@@ -1,6 +1,6 @@
 package com.example.appointments_app.controller;
 
-import com.example.appointments_app.model.CustomUserDetails;
+import com.example.appointments_app.model.authentication.CustomUserDetails;
 import com.example.appointments_app.model.ScreensDTO.HomeDTO;
 import com.example.appointments_app.model.ScreensDTO.InsightsDTO;
 import com.example.appointments_app.service.AppService;
@@ -25,8 +25,8 @@ public class AppController {
     }
 
     @GetMapping("/analytics")
-    public ResponseEntity<?> getAnalytics(@AuthenticationPrincipal CustomUserDetails ownerDetails, @RequestParam String range){
-        InsightsDTO insightsDTO = appService.getInsightsPageDTO(ownerDetails.getId(), 9L, range);
+    public ResponseEntity<?> getAnalytics(@AuthenticationPrincipal CustomUserDetails ownerDetails, @RequestParam Long businessId, @RequestParam String range){
+        InsightsDTO insightsDTO = appService.getInsightsPageDTO(ownerDetails.getId(), businessId, range);
         return ResponseEntity.ok(insightsDTO);
     }
 }

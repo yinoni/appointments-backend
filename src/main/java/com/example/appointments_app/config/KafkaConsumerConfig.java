@@ -1,6 +1,5 @@
 package com.example.appointments_app.config;
 
-import com.example.appointments_app.model.AppointmentEventDTO;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;

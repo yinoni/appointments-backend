@@ -1,9 +1,7 @@
-package com.example.appointments_app.model;
+package com.example.appointments_app.model.appointment;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 public class AppointmentEventDTO implements Serializable {
     private Long businessId;
@@ -21,6 +19,8 @@ public class AppointmentEventDTO implements Serializable {
 
     private boolean newCustomer;
 
+    private String serviceName;
+
 
     public AppointmentEventDTO(Long businessId,
                                Long appointmentId,
@@ -30,7 +30,8 @@ public class AppointmentEventDTO implements Serializable {
                                LocalDateTime appointmentDate,
                                String eventType,
                                String phoneNumber,
-                               boolean newCustomer) {
+                               boolean newCustomer,
+                               String serviceName) {
         this.businessId = businessId;
         this.appointmentId = appointmentId;
         this.businessName = businessName;
@@ -40,6 +41,7 @@ public class AppointmentEventDTO implements Serializable {
         this.eventType = eventType;
         this.phoneNumber = phoneNumber;
         this.newCustomer = newCustomer;
+        this.serviceName = serviceName;
     }
 
     public Long getBusinessId() {
@@ -114,6 +116,14 @@ public class AppointmentEventDTO implements Serializable {
         this.newCustomer = newCustomer;
     }
 
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
     public AppointmentIndex toIndex(){
         AppointmentIndex index = new AppointmentIndex();
         index.setBusinessId(this.businessId);
@@ -123,6 +133,7 @@ public class AppointmentEventDTO implements Serializable {
         index.setTimeCreated(this.appointmentDate);
         index.setStatus(this.eventType);
         index.setFirstTimeCustomer(this.newCustomer);
+        index.setServiceName(this.serviceName);
 
         return index;
     }
