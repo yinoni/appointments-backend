@@ -83,7 +83,7 @@ public class BusinessService {
      *
      * @param businessInput - see BusinessIn class
      * @param ownerId - The owner id
-     * @return - DTO of the business that added
+     * @return - Create a new business with list of services and returns DTO of the business that added
      */
     @Transactional
     public BusinessDTO createBusiness(BusinessInput businessInput, Long ownerId){

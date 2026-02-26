@@ -7,6 +7,7 @@ import com.example.appointments_app.model.appointment.Appointment;
 import com.example.appointments_app.model.appointment.AppointmentDTO;
 import com.example.appointments_app.model.business.Business;
 import com.example.appointments_app.model.business.BusinessDTO;
+import com.example.appointments_app.model.business.BusinessSummary;
 import com.example.appointments_app.model.data_aggregation.RevenueData;
 import com.example.appointments_app.model.schedule.ScheduleDTO;
 import com.example.appointments_app.repo.AppointmentRepo;
@@ -42,19 +43,32 @@ public class AppService {
         this.analyticsService = analyticsService;
     }
 
-    public HomeDTO getHomePageDTO(Long userId){
+    public HomeDTO getOwnerHomePageDTO(Long userId){
         List<BusinessDTO> businesses = businessService.getBusinessesByOwnerId(userId);
-        List<AppointmentDTO> appointmentDTOS = new ArrayList<>();
-        List<RevenueData> revenueDataList = new ArrayList<>();
-
+        BusinessSummary businessSummary = new BusinessSummary();
         if (businesses.isEmpty()) {
             log.info("No businesses found for user {}", userId);
-            return new HomeDTO(businesses, appointmentDTOS, revenueDataList);
+            return new HomeDTO(businesses, businessSummary);
         }
         Long businessId = businesses.get(0).getId();
 
-        revenueDataList = analyticsService.getRevenueAnalytics(businessId, "7_DAYS");
+        businessSummary = getBusinessSummary(userId, businessId);
 
+        return new HomeDTO(businesses, businessSummary);
+    }
+
+    /***
+     *
+     * @param userId - The user ID
+     * @param businessId - The business ID
+     * @return - Summary of the business (Today's appointments and weekly revenue data)
+     */
+    public BusinessSummary getBusinessSummary(Long userId, Long businessId){
+        businessService.findBusinessByIdAndOwnerId(businessId, userId);
+        List<AppointmentDTO> appointmentDTOS = new ArrayList<>();
+        List<RevenueData> revenueDataList = new ArrayList<>();
+
+        revenueDataList = analyticsService.getRevenueAnalytics(businessId, "7_DAYS");
 
         try{
             ScheduleDTO scheduleDTO = businessService.findScheduleByDateAndBusiness(businessId, LocalDate.now());
@@ -65,7 +79,7 @@ public class AppService {
             log.info("There is no schedule for business {} on today's date", businessId);
         }
 
-        return new HomeDTO(businesses, appointmentDTOS, revenueDataList);
+        return new BusinessSummary(appointmentDTOS, revenueDataList);
     }
 
     public InsightsDTO getInsightsPageDTO(Long ownerId, Long businessId, String userSelection){
