@@ -10,9 +10,13 @@ import com.example.appointments_app.model.business.BusinessInput;
 import com.example.appointments_app.model.schedule.Schedule;
 import com.example.appointments_app.model.schedule.ScheduleDTO;
 import com.example.appointments_app.model.schedule.ScheduleIn;
+import com.example.appointments_app.model.service.ServiceDTO;
+import com.example.appointments_app.model.service.ServiceIn;
 import com.example.appointments_app.model.user.User;
 import com.example.appointments_app.repo.AppointmentRepo;
 import com.example.appointments_app.repo.BusinessRepo;
+import com.example.appointments_app.repo.ServiceRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -33,6 +37,7 @@ public class BusinessService {
     private final ScheduleService scheduleService;
     private final BusinessProducer businessProducer;
     private final ElasticSearchService elasticSearchService;
+    private final ServiceRepo serviceRepo;
 
 
     public BusinessService(BusinessRepo businessRepo,
@@ -40,13 +45,15 @@ public class BusinessService {
                            UserService userService,
                            ScheduleService scheduleService,
                            ElasticSearchService elasticSearchService,
-                           BusinessProducer businessProducer){
+                           BusinessProducer businessProducer,
+                           ServiceRepo serviceRepo){
         this.businessRepo = businessRepo;
         this.appointmentRepo = appointmentRepo;
         this.userService = userService;
         this.scheduleService = scheduleService;
         this.businessProducer = businessProducer;
         this.elasticSearchService = elasticSearchService;
+        this.serviceRepo = serviceRepo;
     }
 
     /***
@@ -78,14 +85,28 @@ public class BusinessService {
      * @param ownerId - The owner id
      * @return - DTO of the business that added
      */
+    @Transactional
     public BusinessDTO createBusiness(BusinessInput businessInput, Long ownerId){
         User user = userService.findById(ownerId);
         BusinessDTO bDTO;
 
         Business business = businessInput.toBusiness();
+        final Business finalBusiness = business;
         business.setOwner(user);
 
-        bDTO = save(business).convertToDTO();
+        if(businessInput.getServices() != null){
+            List<com.example.appointments_app.model.service.Service> services =
+                    businessInput.getServices().stream().map(service -> {
+                        var s = service.toService();
+                        s.setBusiness(finalBusiness);
+                        return s;
+                    }).toList();
+
+            business.setServices(services);
+        }
+
+        business = businessRepo.save(business);
+        bDTO = business.convertToDTO();
 
         businessProducer.sendBusinessCreatedEvent(bDTO);
 
