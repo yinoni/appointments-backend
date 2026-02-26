@@ -54,7 +54,7 @@ public class ServiceService {
      *
      * @param serviceIn - The service input ( see ServiceIn class)
      * @param ownerId - The owner id
-     * @return - DTO of the service that just added
+     * @return - DTO of the service that just added, and adds the service in the Business table too
      */
     public ServiceDTO addNewService(ServiceIn serviceIn, Long ownerId){
         Business business = businessService.findBusinessByIdAndOwnerId(serviceIn.getBusinessId(), ownerId);

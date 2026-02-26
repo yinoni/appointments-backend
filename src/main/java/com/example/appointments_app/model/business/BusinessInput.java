@@ -1,6 +1,9 @@
 package com.example.appointments_app.model.business;
 
+import com.example.appointments_app.model.service.ServiceIn;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.example.appointments_app.model.business.BusinessBuilder.aBusiness;
 
@@ -12,6 +15,7 @@ public class BusinessInput {
     private String street;
     private String category;
     private String tagline;
+    private List<ServiceIn> services;
 
     public String getBusinessName() {
         return businessName;
@@ -59,6 +63,14 @@ public class BusinessInput {
 
     public void setTagline(String tagline) {
         this.tagline = tagline;
+    }
+
+    public List<ServiceIn> getServices() {
+        return services;
+    }
+
+    public void setServices(List<ServiceIn> services) {
+        this.services = services;
     }
 
     public Business toBusiness() {
