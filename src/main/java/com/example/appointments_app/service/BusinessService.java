@@ -17,6 +17,7 @@ import com.example.appointments_app.repo.AppointmentRepo;
 import com.example.appointments_app.repo.BusinessRepo;
 import com.example.appointments_app.repo.ServiceRepo;
 import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -42,6 +43,7 @@ public class BusinessService {
     private final ElasticSearchService elasticSearchService;
     @Lazy
     private final ObjectMapper objectMapper;
+    private final ModelMapper modelMapper;
 
 
     public BusinessService(BusinessRepo businessRepo,
@@ -50,7 +52,8 @@ public class BusinessService {
                            ScheduleService scheduleService,
                            ElasticSearchService elasticSearchService,
                            BusinessProducer businessProducer,
-                           ObjectMapper objectMapper){
+                           ObjectMapper objectMapper,
+                           ModelMapper modelMapper){
         this.businessRepo = businessRepo;
         this.appointmentRepo = appointmentRepo;
         this.userService = userService;
@@ -58,6 +61,7 @@ public class BusinessService {
         this.businessProducer = businessProducer;
         this.elasticSearchService = elasticSearchService;
         this.objectMapper = objectMapper;
+        this.modelMapper = modelMapper;
     }
 
     /***
@@ -76,11 +80,14 @@ public class BusinessService {
 
     public Business updateBusiness(Long b_id, Long ownerId, BusinessInput businessInput){
         Business business = findBusinessByIdAndOwnerId(b_id, ownerId);
-        business.setBusinessName(businessInput.getBusinessName());
-        business.setDescription(businessInput.getBusinessDesc());
-        business.setCity(businessInput.getCity());
-        business.setStreet(businessInput.getStreet());
-        return save(business);
+
+        modelMapper.map(businessInput, business);
+
+        business = save(business);
+
+        businessProducer.sendBusinessUpdatedEvent(business.convertToDTO());
+
+        return business;
     }
 
     /***

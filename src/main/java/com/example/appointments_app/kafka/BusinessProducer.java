@@ -25,4 +25,10 @@ public class BusinessProducer {
         kafkaTemplate.send("business-created", msg);
     }
 
+    public void sendBusinessUpdatedEvent(BusinessDTO bDTO){
+        String msg = om.writeValueAsString(bDTO);
+
+        kafkaTemplate.send("business-updated", msg);
+    }
+
 }
