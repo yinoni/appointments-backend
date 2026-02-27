@@ -38,4 +38,15 @@ public class BusinessConsumer {
             System.out.println(e.getMessage());
         }
     }
+
+    @KafkaListener(topics = "business-updated", groupId = "appointments-group-final-1")
+    public void businessUpdatedEvent(String event) throws IOException {
+        try{
+            BusinessDTO businessDTO = om.readValue(event, BusinessDTO.class);
+            elasticSearchService.indexDocument("businesses", String.valueOf(businessDTO.getId()), businessDTO);
+        }
+        catch (IOException e){
+            System.out.println(e.getMessage());
+        }
+    }
 }

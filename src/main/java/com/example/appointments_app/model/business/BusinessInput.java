@@ -10,7 +10,7 @@ import static com.example.appointments_app.model.business.BusinessBuilder.aBusin
 public class BusinessInput {
 
     private String businessName;
-    private String businessDesc;
+    private String description;
     private String city;
     private String street;
     private String category;
@@ -26,11 +26,11 @@ public class BusinessInput {
     }
 
     public String getBusinessDesc() {
-        return businessDesc;
+        return description;
     }
 
     public void setBusinessDesc(String businessDesc) {
-        this.businessDesc = businessDesc;
+        this.description = businessDesc;
     }
 
     public String getCity() {
@@ -76,7 +76,7 @@ public class BusinessInput {
     public Business toBusiness() {
         return aBusiness()
                 .withBusinessName(this.businessName)
-                .withDescription(this.businessDesc)
+                .withDescription(this.description)
                 .withCity(this.city)
                 .withStreet(this.street)
                 .withCategory(BusinessCategory.fromString(this.category.toUpperCase()))

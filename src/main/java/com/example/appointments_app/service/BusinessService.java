@@ -17,9 +17,13 @@ import com.example.appointments_app.repo.AppointmentRepo;
 import com.example.appointments_app.repo.BusinessRepo;
 import com.example.appointments_app.repo.ServiceRepo;
 import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -37,7 +41,9 @@ public class BusinessService {
     private final ScheduleService scheduleService;
     private final BusinessProducer businessProducer;
     private final ElasticSearchService elasticSearchService;
-    private final ServiceRepo serviceRepo;
+    @Lazy
+    private final ObjectMapper objectMapper;
+    private final ModelMapper modelMapper;
 
 
     public BusinessService(BusinessRepo businessRepo,
@@ -46,14 +52,16 @@ public class BusinessService {
                            ScheduleService scheduleService,
                            ElasticSearchService elasticSearchService,
                            BusinessProducer businessProducer,
-                           ServiceRepo serviceRepo){
+                           ObjectMapper objectMapper,
+                           ModelMapper modelMapper){
         this.businessRepo = businessRepo;
         this.appointmentRepo = appointmentRepo;
         this.userService = userService;
         this.scheduleService = scheduleService;
         this.businessProducer = businessProducer;
         this.elasticSearchService = elasticSearchService;
-        this.serviceRepo = serviceRepo;
+        this.objectMapper = objectMapper;
+        this.modelMapper = modelMapper;
     }
 
     /***
@@ -72,11 +80,14 @@ public class BusinessService {
 
     public Business updateBusiness(Long b_id, Long ownerId, BusinessInput businessInput){
         Business business = findBusinessByIdAndOwnerId(b_id, ownerId);
-        business.setBusinessName(businessInput.getBusinessName());
-        business.setDescription(businessInput.getBusinessDesc());
-        business.setCity(businessInput.getCity());
-        business.setStreet(businessInput.getStreet());
-        return save(business);
+
+        modelMapper.map(businessInput, business);
+
+        business = save(business);
+
+        businessProducer.sendBusinessUpdatedEvent(business.convertToDTO());
+
+        return business;
     }
 
     /***
@@ -243,6 +254,55 @@ public class BusinessService {
         dto.setAvailable_hours(availableHours);
 
         return dto;
+    }
+
+    /***
+     *
+     * @param category - The category name that we will filter by
+     * @param rating - The rating that we will filter by
+     * @param distance - The distance that we will filter by (Not available)
+     * @return - List of all the businesses with category {category} and reating bigger than {Rating}
+     */
+    public List<BusinessDTO> filterBusinesses(String category, Double rating, Double distance){
+        List<BusinessDTO> businessDTOS = new ArrayList<>();
+        // 1. רשימה שתחזיק את חלקי הפילטרים
+        List<String> filters = new ArrayList<>();
+
+        if (category != null && !category.isEmpty()) {
+            filters.add(String.format("{\"match\": {\"category\": \"%s\"}}", category));
+        }
+
+        if (rating != null && rating > 0) {
+            filters.add(String.format("{\"range\": {\"rating\": {\"gte\": %.1f}}}", rating));
+        }
+
+        // 2. חיבור הפילטרים למחרוזת אחת עם פסיק ביניהם
+        String filterSection = String.join(",", filters);
+
+        // 3. בניית ה-JSON הסופי - פעם אחת בלבד!
+        String finalPipeline = String.format("""
+        {
+          "size": 20,
+          "query": {
+            "bool": {
+              "filter": [ %s ]
+            }
+          }
+        }
+        """, filterSection);
+
+        String response = elasticSearchService.aggregate("businesses", finalPipeline);
+
+        JsonNode root = objectMapper.readTree(response);
+        JsonNode hits = root.path("hits").path("hits");
+
+        for(JsonNode node : hits){
+            JsonNode source = node.path("_source");
+            businessDTOS.add(objectMapper.treeToValue(source, BusinessDTO.class));
+        }
+
+        return businessDTOS;
+
     }
 
 
