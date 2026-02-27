@@ -136,4 +136,17 @@ public class BusinessController {
 
         return ResponseEntity.ok(scheduleDTO);
     }
+
+    /***
+     *
+     * @param category - The category that we would like to filter by
+     * @param rating - The rating that we would like to filter by
+     * @return - List of all the businesses with category {category} and with rating bigger than the request param rating
+     */
+    @GetMapping("/filter")
+    public ResponseEntity<?> filterBusinesses(@RequestParam(defaultValue = "") String category, @RequestParam(defaultValue = "0") Double rating){
+        List<BusinessDTO> businessDTOS = businessService.filterBusinesses(category, rating, 0D);
+
+        return ResponseEntity.ok(businessDTOS);
+    }
 }

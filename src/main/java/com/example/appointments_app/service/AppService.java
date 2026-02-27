@@ -30,7 +30,7 @@ public class AppService {
     private final BusinessService businessService;
     @Lazy
     private final AppointmentRepo appointmentRepo;
-
+    @Lazy
     private final AnalyticsService analyticsService;
 
     public AppService(AuthService authService,
@@ -43,6 +43,11 @@ public class AppService {
         this.analyticsService = analyticsService;
     }
 
+    /***
+     *
+     * @param userId - The current user ID
+     * @return - HomeDTO that contains all the information about the first business
+     */
     public HomeDTO getOwnerHomePageDTO(Long userId){
         List<BusinessDTO> businesses = businessService.getBusinessesByOwnerId(userId);
         BusinessSummary businessSummary = new BusinessSummary();
