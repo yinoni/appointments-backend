@@ -249,6 +249,13 @@ public class BusinessService {
         return dto;
     }
 
+    /***
+     *
+     * @param category - The category name that we will filter by
+     * @param rating - The rating that we will filter by
+     * @param distance - The distance that we will filter by (Not available)
+     * @return - List of all the businesses with category {category} and reating bigger than {Rating}
+     */
     public List<BusinessDTO> filterBusinesses(String category, Double rating, Double distance){
         List<BusinessDTO> businessDTOS = new ArrayList<>();
         // 1. רשימה שתחזיק את חלקי הפילטרים
