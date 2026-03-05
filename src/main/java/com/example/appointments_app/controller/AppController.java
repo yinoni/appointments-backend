@@ -36,4 +36,9 @@ public class AppController {
         InsightsDTO insightsDTO = appService.getInsightsPageDTO(ownerDetails.getId(), businessId, range);
         return ResponseEntity.ok(insightsDTO);
     }
+
+    @PostMapping("/toggle_favorite/{businessID}")
+    public ResponseEntity<?> toggleFavoriteBusiness(@PathVariable("businessID") Long businessID, @AuthenticationPrincipal CustomUserDetails userDetails){
+        return ResponseEntity.ok(appService.toggleFavorite(userDetails.getId(), businessID));
+    }
 }

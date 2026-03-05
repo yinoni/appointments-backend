@@ -1,12 +1,18 @@
 package com.example.appointments_app.service;
 
+import co.elastic.clients.elasticsearch.nodes.Http;
 import com.example.appointments_app.exception.AuthenticationException;
+import com.example.appointments_app.exception.BusinessException;
+import com.example.appointments_app.exception.UserNotFoundException;
 import com.example.appointments_app.kafka.UserProducer;
 import com.example.appointments_app.model.authentication.CustomUserDetails;
+import com.example.appointments_app.model.business.Business;
 import com.example.appointments_app.model.user.User;
 import com.example.appointments_app.model.user.UserEventDTO;
 import com.example.appointments_app.model.user.UserIn;
+import com.example.appointments_app.repo.BusinessRepo;
 import com.example.appointments_app.repo.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -22,11 +29,16 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserProducer userProducer;
+    private final BusinessRepo businessRepo;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserProducer userProducer){
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       UserProducer userProducer,
+                       BusinessRepo businessRepo){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userProducer = userProducer;
+        this.businessRepo = businessRepo;
     }
 
     public User findById(Long id){
@@ -41,6 +53,9 @@ public class UserService implements UserDetailsService {
         return userRepository.findUserByPhoneNumber(phone).orElseThrow(()->new UsernameNotFoundException("User not found"));
     }
 
+    public User saveUser(User user){
+        return userRepository.save(user);
+    }
 
     public User register(UserIn userIn){
         try{
@@ -65,7 +80,6 @@ public class UserService implements UserDetailsService {
            throw  new AuthenticationException("Phone number is used!", HttpStatus.BAD_REQUEST);
         }
     }
-
 
     @Override
     public CustomUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

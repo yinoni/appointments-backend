@@ -29,6 +29,14 @@ public class User {
     @OneToMany(mappedBy = "owner")
     private Set<Business> businesses;
 
+    @ManyToMany
+    @JoinTable(
+            name = "user_favorites",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "business_id")
+    )
+    private Set<Business> savedBusinesses;
+
     public User() {
     }
 
@@ -89,6 +97,16 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public Set<Business> getSavedBusinesses() {
+        return savedBusinesses;
+    }
+
+    public void setSavedBusinesses(Set<Business> savedBusinesses) {
+        this.savedBusinesses = savedBusinesses;
+    }
+
+
 
     public UserDTO convertToUserDTO(){
         UserDTO dto = new UserDTO();

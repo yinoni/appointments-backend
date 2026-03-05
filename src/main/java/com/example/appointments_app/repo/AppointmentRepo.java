@@ -9,6 +9,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 public interface AppointmentRepo extends CrudRepository<Appointment, Long> {
 
     @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END FROM Appointment a WHERE a.user.phoneNumber = :phone")
@@ -33,4 +36,13 @@ public interface AppointmentRepo extends CrudRepository<Appointment, Long> {
 
     @Query("SELECT a FROM Appointment a WHERE a.schedule.id = :s_id ORDER BY a.time ASC")
     Page<Appointment> getAppointmentsByScheduleId(@Param("s_id") Long s_id, PageRequest pageRequest);
+
+    @Query("SELECT a FROM Appointment a " +
+            "WHERE a.user.id = :userId " +
+            "AND a.schedule.date > :date OR (a.schedule.date = :date AND a.time >= :time) " +
+            "ORDER BY a.schedule.date ASC")
+    Page<Appointment> getUpcomingAppointments(@Param("date")LocalDate date,
+                                              @Param("userId") Long userId,
+                                              @Param("time") LocalTime time,
+                                              PageRequest pageRequest);
 }
