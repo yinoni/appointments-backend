@@ -4,24 +4,34 @@ import com.example.appointments_app.exception.AppointmentAlreadyExistsException;
 import com.example.appointments_app.exception.BusinessException;
 import com.example.appointments_app.kafka.AppointmentProducer;
 import com.example.appointments_app.model.appointment.Appointment;
+import com.example.appointments_app.model.appointment.AppointmentDTO;
 import com.example.appointments_app.model.appointment.AppointmentEventDTO;
 import com.example.appointments_app.model.appointment.AppointmentIn;
 import com.example.appointments_app.model.schedule.Schedule;
 import com.example.appointments_app.model.user.User;
 import com.example.appointments_app.repo.AppointmentRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 
 @Service
 public class AppointmentService {
 
+    private static final Logger log = LoggerFactory.getLogger(AppointmentService.class);
     private final UserService userService;
     private final ServiceService serviceService;
     private final ScheduleService scheduleService;
     private final AppointmentRepo appointmentRepo;
     private final AppointmentProducer appointmentProducer;
+    private final int APPOINTMENT_PAGE_SIZE = 5;
 
     public AppointmentService(UserService userService,
                               AppointmentRepo appointmentRepo,
@@ -87,5 +97,17 @@ public class AppointmentService {
         appointmentRepo.deleteAppointmentByServiceId(serviceId);
     }
 
+    /***
+     *
+     * @param userId - The ID of the current user
+     * @param page - The page number
+     * @return - List of appointments that after the current date and booked by the current user
+     */
+    public List<AppointmentDTO> getUpcomingAppointments(Long userId, int page){
+        PageRequest pageRequest = PageRequest.of(page, APPOINTMENT_PAGE_SIZE);
+        Page<Appointment> pageData = appointmentRepo.getUpcomingAppointments(LocalDate.now(), userId, LocalTime.now(), pageRequest);
+        List<AppointmentDTO> appointmentDTOS = pageData.stream().map(Appointment::convertToDTO).toList();
 
+        return appointmentDTOS;
+    }
 }

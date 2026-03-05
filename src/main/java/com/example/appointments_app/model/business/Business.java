@@ -55,7 +55,6 @@ public class Business {
     @Column(name = "category", length = 50) // כדאי להגביל אורך לביצועים
     private BusinessCategory category;
 
-
     public Business() {
     }
 

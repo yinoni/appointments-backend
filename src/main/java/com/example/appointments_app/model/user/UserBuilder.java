@@ -12,6 +12,7 @@ public final class UserBuilder {
     private String password;
     private String role;
     private Set<Business> businesses;
+    private Set<Business> savedBusinesses;
 
     private UserBuilder() {
     }
@@ -55,6 +56,11 @@ public final class UserBuilder {
         return this;
     }
 
+    public UserBuilder withSavedBusinesses(Set<Business> savedBusinesses) {
+        this.savedBusinesses = savedBusinesses;
+        return this;
+    }
+
     public User build() {
         User user = new User();
         user.setId(id);
@@ -64,6 +70,7 @@ public final class UserBuilder {
         user.setPassword(password);
         user.setRole(role);
         user.setBusinesses(businesses);
+        user.setSavedBusinesses(savedBusinesses);
         return user;
     }
 }
