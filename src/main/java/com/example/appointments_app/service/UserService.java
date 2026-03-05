@@ -29,16 +29,13 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserProducer userProducer;
-    private final BusinessRepo businessRepo;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       UserProducer userProducer,
-                       BusinessRepo businessRepo){
+                       UserProducer userProducer){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userProducer = userProducer;
-        this.businessRepo = businessRepo;
     }
 
     public User findById(Long id){
