@@ -162,7 +162,6 @@ public class Business {
     public BusinessDTO convertToDTO(){
         BusinessDTO dto = new BusinessDTO();
         List<ServiceDTO> services = this.services.stream().map(Service::convertToDTO).toList();
-        List<ScheduleDTO> schedules = this.schedules.stream().map(Schedule::convertToDTO).toList();
 
         dto.setId(this.id);
         dto.setBusinessName(this.businessName);
@@ -173,7 +172,7 @@ public class Business {
         dto.setServices(services);
         dto.setRating(this.rating);
         dto.setTagline(this.tagline);
-        dto.setCategory(this.category.getDisplayName());
+        dto.setCategory(this.getCategory().getDisplayName());
 
         return dto;
     }

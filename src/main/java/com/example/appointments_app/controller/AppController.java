@@ -3,11 +3,14 @@ package com.example.appointments_app.controller;
 import com.example.appointments_app.model.authentication.CustomUserDetails;
 import com.example.appointments_app.model.ScreensDTO.HomeDTO;
 import com.example.appointments_app.model.ScreensDTO.InsightsDTO;
+import com.example.appointments_app.model.business.BusinessDTO;
 import com.example.appointments_app.model.business.BusinessSummary;
 import com.example.appointments_app.service.AppService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/")
@@ -40,5 +43,12 @@ public class AppController {
     @PostMapping("/toggle_favorite/{businessID}")
     public ResponseEntity<?> toggleFavoriteBusiness(@PathVariable("businessID") Long businessID, @AuthenticationPrincipal CustomUserDetails userDetails){
         return ResponseEntity.ok(appService.toggleFavorite(userDetails.getId(), businessID));
+    }
+
+    @GetMapping("/saved_businesses")
+    public ResponseEntity<?> getSavedBusinesses(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam Integer page){
+        Set<BusinessDTO> businessDTOSet = appService.getSavedBusinesses(userDetails.getId(), page);
+
+        return ResponseEntity.ok(businessDTOSet);
     }
 }

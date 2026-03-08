@@ -35,5 +35,9 @@ public class UserProducer {
         }
     }
 
+    public void phoneVerifiedEvent(UserEventDTO eventDTO){
+        kafkaTemplate.send("phone-verified", om.writeValueAsString(eventDTO));
+    }
+
 
 }

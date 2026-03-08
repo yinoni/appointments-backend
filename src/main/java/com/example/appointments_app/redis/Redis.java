@@ -5,20 +5,37 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class Redis {
     private final RedisTemplate redisTemplate;
 
     private final int DAY_DIVIDER = 5;
+    public static final String OTP_PREFIX = "user:otp:";
+    private final int OTP_DURATION = 60;
 
     public Redis(RedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
+    }
+
+    public void setKey(String key, String value, int exp, TimeUnit timeUnit){
+        redisTemplate.opsForValue().set(key, value, exp, timeUnit);
+    }
+
+    public Object getKey(String key){
+        return redisTemplate.opsForValue().get(key);
+    }
+
+
+    public boolean deleteKey(String key){
+        return redisTemplate.delete(key);
     }
 
     public boolean setBit(String key, Long offset, boolean value){
@@ -101,6 +118,37 @@ public class Redis {
         return availableHours;
     }
 
+    /***
+     *
+     * @param phone - The user phone number
+     * @param privateCode - The 4-digit code that has been sent to him
+     */
+    public void saveOtp(String phone, String privateCode){
+        String key = OTP_PREFIX + phone;
+        this.setKey(key, privateCode, OTP_DURATION, TimeUnit.SECONDS);
+        this.setKey(OTP_PREFIX + phone + ":counter", "0", OTP_DURATION, TimeUnit.SECONDS);
+    }
+
+    /***
+     *
+     * @param phone - The user phone number
+     * @return - This function increase the attempts counter by one and returns it
+     */
+    public int incrementAndGetCounter(String phone) {
+        String counterKey = OTP_PREFIX + phone + ":counter";
+        Long val = redisTemplate.opsForValue().increment(counterKey);
+        return val != null ? val.intValue() : 0;
+    }
+
+    /***
+     *
+     * @param phone - The user phone number
+     * @return - This function returns the OTP code that sent to this phone number
+     */
+    public String getOtpCode(String phone) {
+        Object code = redisTemplate.opsForValue().get(OTP_PREFIX + phone);
+        return code != null ? code.toString() : null;
+    }
 
 
 }

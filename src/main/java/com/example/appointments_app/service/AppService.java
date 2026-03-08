@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -28,12 +29,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AppService {
 
     private static final Logger log = LoggerFactory.getLogger(AppService.class);
-    private final AuthService authService;
     private final BusinessService businessService;
     @Lazy
     private final AppointmentRepo appointmentRepo;
@@ -43,12 +44,10 @@ public class AppService {
     private final UserRepository userRepository;
 
 
-    public AppService(AuthService authService,
-                         BusinessService businessService,
+    public AppService(BusinessService businessService,
                       AppointmentRepo appointmentRepo,
                       AnalyticsService analyticsService,
                       UserRepository userRepository) {
-        this.authService = authService;
         this.businessService = businessService;
         this.appointmentRepo = appointmentRepo;
         this.analyticsService = analyticsService;
@@ -128,6 +127,15 @@ public class AppService {
 
         userRepository.save(user);
         return inserted;
+    }
+
+
+    public Set<BusinessDTO> getSavedBusinesses(Long userID, Integer page){
+        Page pageResponse = userRepository.findSavedBusinessesByUserId(userID, PageRequest.of(page, 10));
+
+        Set<BusinessDTO> businessDTOS = (Set<BusinessDTO>) pageResponse.map(b -> ((Business) b).convertToDTO()).stream().collect(Collectors.toSet());
+
+        return businessDTOS;
     }
 
     
