@@ -3,6 +3,7 @@ package com.example.appointments_app.controller;
 import com.example.appointments_app.jwt.JwtService;
 import com.example.appointments_app.model.authentication.AuthRequest;
 import com.example.appointments_app.model.authentication.CustomUserDetails;
+import com.example.appointments_app.model.authentication.PhoneVerifyInput;
 import com.example.appointments_app.model.user.UserIn;
 import com.example.appointments_app.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +58,12 @@ public class AuthController {
         userService.register(userIn);
 
         return ResponseEntity.ok("The user registered successfully");
+    }
+
+    @PostMapping("/phone-verify")
+    public ResponseEntity<?> phoneVerify(@RequestBody PhoneVerifyInput phoneVerifyInput){
+        userService.verifyPhoneNumber(phoneVerifyInput);
+        return ResponseEntity.ok("OK");
     }
 
 }
