@@ -66,4 +66,10 @@ public class AuthController {
         return ResponseEntity.ok("OK");
     }
 
+    @PostMapping("/resend-code")
+    public ResponseEntity<?> resendCode(@RequestBody String phoneNumber){
+        userService.resendOtpCode(phoneNumber);
+        return ResponseEntity.ok("OK");
+    }
+
 }
