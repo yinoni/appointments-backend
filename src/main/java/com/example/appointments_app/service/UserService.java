@@ -1,14 +1,12 @@
 package com.example.appointments_app.service;
 
 import co.elastic.clients.elasticsearch.nodes.Http;
-import com.example.appointments_app.exception.AuthenticationException;
-import com.example.appointments_app.exception.BusinessException;
-import com.example.appointments_app.exception.InvalidOTPException;
-import com.example.appointments_app.exception.UserNotFoundException;
+import com.example.appointments_app.exception.*;
 import com.example.appointments_app.kafka.UserProducer;
 import com.example.appointments_app.model.authentication.CustomUserDetails;
 import com.example.appointments_app.model.authentication.PhoneVerifyInput;
 import com.example.appointments_app.model.business.Business;
+import com.example.appointments_app.model.user.OtpTaskCode;
 import com.example.appointments_app.model.user.User;
 import com.example.appointments_app.model.user.UserEventDTO;
 import com.example.appointments_app.model.user.UserIn;
@@ -22,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -35,6 +34,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final UserProducer userProducer;
     private final Redis redis;
+    private final SecureRandom secureRandom = new SecureRandom();
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
@@ -129,6 +129,26 @@ public class UserService implements UserDetailsService {
         userProducer.phoneVerifiedEvent(new UserEventDTO(user.getFullName(), user.getEmail(), user.getPhoneNumber()));
         redis.deleteKey(otpCode);
         redis.deleteKey(otpCode + ":counter");
+    }
+
+    /***
+     *
+     * @param phoneNumber - The phone number that the new code will be sent to
+     */
+    public void resendOtpCode(String phoneNumber){
+        if(redis.getOtpCode(phoneNumber) == null){
+            String privateCode = generateOTPCode();
+            redis.saveOtp(phoneNumber, privateCode);
+
+            userProducer.resendOTPEvent(new OtpTaskCode(phoneNumber, privateCode));
+        }
+        else
+            throw new OtpNotExpiredException("The OTP is not expired yet!");
+    }
+
+    public String generateOTPCode(){
+        int code = secureRandom.nextInt(10000);
+        return String.format("%04d", code);
     }
 
 }

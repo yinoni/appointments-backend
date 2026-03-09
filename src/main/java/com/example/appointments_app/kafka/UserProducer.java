@@ -1,5 +1,6 @@
 package com.example.appointments_app.kafka;
 
+import com.example.appointments_app.model.user.OtpTaskCode;
 import com.example.appointments_app.model.user.UserEventDTO;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,10 @@ public class UserProducer {
 
     public void phoneVerifiedEvent(UserEventDTO eventDTO){
         kafkaTemplate.send("phone-verified", om.writeValueAsString(eventDTO));
+    }
+
+    public void resendOTPEvent(OtpTaskCode code){
+        kafkaTemplate.send("resend-otp-code", om.writeValueAsString(code));
     }
 
 
