@@ -1,14 +1,19 @@
 package com.example.appointments_app.model.schedule;
 
+import com.example.appointments_app.model.appointment.AppointmentDTO;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ScheduleDTO {
     private Long id;
     private LocalDate date;
     private Long business;
-    private List<LocalTime> available_hours;
+    private Map<LocalTime, Boolean> hours;
+    private List<AppointmentDTO> appointments = new ArrayList<>();
 
     public ScheduleDTO() {
     }
@@ -37,11 +42,19 @@ public class ScheduleDTO {
         this.business = business;
     }
 
-    public List<LocalTime> getAvailable_hours() {
-        return available_hours;
+    public Map<LocalTime, Boolean> getHours() {
+        return this.hours;
     }
 
-    public void setAvailable_hours(List<LocalTime> available_hours) {
-        this.available_hours = available_hours;
+    public void setHours(Map<LocalTime, Boolean> hours) {
+        this.hours = hours;
+    }
+
+    public List<AppointmentDTO> getAppointments() {
+        return appointments;
+    }
+
+    public void setAppointments(List<AppointmentDTO> appointments) {
+        this.appointments = appointments;
     }
 }

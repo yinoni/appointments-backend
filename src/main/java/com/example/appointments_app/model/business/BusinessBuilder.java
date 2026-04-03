@@ -18,10 +18,12 @@ public final class BusinessBuilder {
     private String description;
     private String city;
     private String street;
+    private BusinessCountry country;
     private @Min(1)
     @Max(5) Double rating;
     private String tagline;
     private BusinessCategory category;
+    private String imageFile;
 
     private BusinessBuilder() {
     }
@@ -75,6 +77,11 @@ public final class BusinessBuilder {
         return this;
     }
 
+    public BusinessBuilder withCountry(BusinessCountry country) {
+        this.country = country;
+        return this;
+    }
+
     public BusinessBuilder withRating(Double rating) {
         this.rating = rating;
         return this;
@@ -90,6 +97,11 @@ public final class BusinessBuilder {
         return this;
     }
 
+    public BusinessBuilder withImageFile(String imageFile) {
+        this.imageFile = imageFile;
+        return this;
+    }
+
     public Business build() {
         Business business = new Business();
         business.setId(id);
@@ -101,9 +113,11 @@ public final class BusinessBuilder {
         business.setDescription(description);
         business.setCity(city);
         business.setStreet(street);
+        business.setCountry(country);
         business.setRating(rating);
         business.setTagline(tagline);
         business.setCategory(category);
+        business.setImageFile(imageFile);
         return business;
     }
 }

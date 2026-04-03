@@ -3,9 +3,7 @@ package com.example.appointments_app.model.data_aggregation;
 public class ServicePerformanceDTO {
 
     private String serviceName;
-
     private Integer bookings;
-
     private Double revenue;
 
     public ServicePerformanceDTO(String serviceName, Integer bookings, Double revenue) {

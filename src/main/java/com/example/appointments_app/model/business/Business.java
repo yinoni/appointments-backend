@@ -8,6 +8,7 @@ import com.example.appointments_app.model.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -43,6 +44,10 @@ public class Business {
     @Column(nullable = false, name = "street", columnDefinition = "varchar(255) default 'N/A'")
     private String street;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "country", length = 50)
+    private BusinessCountry country;
+
     @Column(nullable = false, name = "rating")
     @Min(1)
     @Max(5)
@@ -54,6 +59,9 @@ public class Business {
     @Enumerated(EnumType.STRING) // זה מה שיוצר את עמודת ה-VARCHAR ב-DB
     @Column(name = "category", length = 50) // כדאי להגביל אורך לביצועים
     private BusinessCategory category;
+
+    @Column(columnDefinition = "varchar(255) default ''")
+    private String imageFile;
 
     public Business() {
     }
@@ -159,6 +167,22 @@ public class Business {
         this.category = category;
     }
 
+    public BusinessCountry getCountry() {
+        return country;
+    }
+
+    public void setCountry(BusinessCountry country) {
+        this.country = country;
+    }
+
+    public String getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(String imageFile) {
+        this.imageFile = imageFile;
+    }
+
     public BusinessDTO convertToDTO(){
         BusinessDTO dto = new BusinessDTO();
         List<ServiceDTO> services = this.services.stream().map(Service::convertToDTO).toList();
@@ -173,6 +197,8 @@ public class Business {
         dto.setRating(this.rating);
         dto.setTagline(this.tagline);
         dto.setCategory(this.getCategory().getDisplayName());
+        dto.setCountry(this.country.getDisplayName());
+        dto.setImageFile(this.imageFile);
 
         return dto;
     }

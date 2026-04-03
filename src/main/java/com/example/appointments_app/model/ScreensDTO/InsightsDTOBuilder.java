@@ -11,6 +11,9 @@ public final class InsightsDTOBuilder {
     private int new_customers;
     private double rating;
     private List<ServicePerformanceDTO> servicesPerformance;
+    private double revenueGrowth;
+    private double bookingsGrowth;
+    private double newCustomersGrowth;
 
     private InsightsDTOBuilder() {
     }
@@ -44,6 +47,21 @@ public final class InsightsDTOBuilder {
         return this;
     }
 
+    public InsightsDTOBuilder withRevenueGrowth(double revenueGrowth) {
+        this.revenueGrowth = revenueGrowth;
+        return this;
+    }
+
+    public InsightsDTOBuilder withBookingsGrowth(double bookingsGrowth) {
+        this.bookingsGrowth = bookingsGrowth;
+        return this;
+    }
+
+    public InsightsDTOBuilder withNewCustomersGrowth(double newCustomersGrowth) {
+        this.newCustomersGrowth = newCustomersGrowth;
+        return this;
+    }
+
     public InsightsDTO build() {
         InsightsDTO insightsDTO = new InsightsDTO();
         insightsDTO.setRevenueDataList(revenueDataList);
@@ -51,6 +69,9 @@ public final class InsightsDTOBuilder {
         insightsDTO.setNew_customers(new_customers);
         insightsDTO.setRating(rating);
         insightsDTO.setServicesPerformance(servicesPerformance);
+        insightsDTO.setRevenueGrowth(revenueGrowth);
+        insightsDTO.setBookingsGrowth(bookingsGrowth);
+        insightsDTO.setNewCustomersGrowth(newCustomersGrowth);
         return insightsDTO;
     }
 }

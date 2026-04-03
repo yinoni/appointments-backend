@@ -1,5 +1,7 @@
 package com.example.appointments_app.redis;
 
+import org.springframework.cglib.core.Local;
+import org.springframework.data.redis.connection.BitFieldSubCommands;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -8,9 +10,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Time;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -23,6 +23,10 @@ public class Redis {
 
     public Redis(RedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
+    }
+
+    public void setKey(String key, String value){
+        redisTemplate.opsForValue().set(key, value);
     }
 
     public void setKey(String key, String value, int exp, TimeUnit timeUnit){
@@ -106,16 +110,22 @@ public class Redis {
         return LocalTime.of(hour, minutes);
     }
 
-    public List<LocalTime> getHoursFromOffsetRange(String key, long start, long end, int min_duration){
+    public Map<LocalTime, Boolean> getHoursFromOffsetRange(String key, long start, long end, int min_duration){
         List<LocalTime> availableHours = new ArrayList<>();
+        Map<LocalTime, Boolean> hoursMap = new HashMap<>();
 
         for(long i = start; i<=end; i+=(min_duration / DAY_DIVIDER)){
             LocalTime temp = offsetToLocalTime(min_duration, i);
-            if(!redisTemplate.opsForValue().getBit(key, i ))
+            boolean free = false;
+            if(!redisTemplate.opsForValue().getBit(key, i )){
                 availableHours.add(temp);
+                free = true;
+            }
+
+            hoursMap.put(temp, free);
         }
 
-        return availableHours;
+        return hoursMap;
     }
 
     /***
@@ -148,6 +158,38 @@ public class Redis {
     public String getOtpCode(String phone) {
         Object code = redisTemplate.opsForValue().get(OTP_PREFIX + phone);
         return code != null ? code.toString() : null;
+    }
+
+    public void toggleBit(String key, LocalTime hour) {
+        long offset = getOffset(hour);
+        BitFieldSubCommands.BitFieldType u1 = BitFieldSubCommands.BitFieldType.unsigned(1);
+
+        // יצירת הפקודה: Increment ב-1 במיקום ה-offset
+        BitFieldSubCommands subCommands = BitFieldSubCommands.create()
+                .incr(u1)
+                .valueAt(offset) // בחלק מהגרסאות זה 'at', באחרות 'valueAt'
+                .by(1);
+
+        // הרצה - מחזיר רשימה של הערכים החדשים לאחר הפעולה
+        List<Long> results = redisTemplate.opsForValue().bitField(key, subCommands);
+    }
+
+    public void addToSet(String key, String value){
+        redisTemplate.opsForSet().add(key, value);
+    }
+
+    public void addToSet(String key, String value, long ttl){
+        redisTemplate.opsForSet().add(key, value, ttl);
+    }
+
+    public void removeFromSet(String key, String value){
+        redisTemplate.opsForSet().remove(key, value);
+    }
+
+    public boolean isInSet(String key, String value){
+        Boolean isMember = redisTemplate.opsForSet().isMember(key, value);
+
+        return Boolean.TRUE.equals(isMember);
     }
 
 

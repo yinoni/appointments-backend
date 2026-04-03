@@ -1,21 +1,29 @@
 package com.example.appointments_app.jwt;
 
+import com.example.appointments_app.redis.Redis;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.security.sasl.AuthenticationException;
 import java.io.IOException;
+
+import static com.example.appointments_app.service.UserService.LOGGED_OUT_SET_REDIS_KEY;
 
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+
+    @Autowired
+    private Redis redis;
 
     public JwtFilter(JwtService jwtService,  UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
@@ -40,6 +48,10 @@ public class JwtFilter extends OncePerRequestFilter {
                         userDetailsService.loadUserByUsername(username);
 
                 if (jwtService.isTokenValid(token, user)) {
+
+                    if(redis.isInSet(LOGGED_OUT_SET_REDIS_KEY, authHeader))
+                        throw new AuthenticationException("Invalid token");
+
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(
                                     user, null, user.getAuthorities());

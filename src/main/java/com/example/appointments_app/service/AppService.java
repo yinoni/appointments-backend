@@ -82,12 +82,10 @@ public class AppService {
     public BusinessSummary getBusinessSummary(Long userId, Long businessId){
         businessService.findBusinessByIdAndOwnerId(businessId, userId);
         List<AppointmentDTO> appointmentDTOS = new ArrayList<>();
-        List<RevenueData> revenueDataList = new ArrayList<>();
-
-        revenueDataList = analyticsService.getRevenueAnalytics(businessId, "7_DAYS");
+        List<RevenueData> revenueDataList = analyticsService.getRevenueAnalytics(businessId, "7D");
 
         try{
-            ScheduleDTO scheduleDTO = businessService.findScheduleByDateAndBusiness(businessId, LocalDate.now());
+            ScheduleDTO scheduleDTO = businessService.findScheduleByDateAndBusiness(businessId, LocalDate.now(), 0, 5);
             Page<Appointment> todayAppointments = appointmentRepo.getAppointmentsByScheduleId(scheduleDTO.getId(), PageRequest.of(0, 5));
             appointmentDTOS = todayAppointments.stream().map(Appointment::convertToDTO).toList();
         }
@@ -99,7 +97,7 @@ public class AppService {
     }
 
     public InsightsDTO getInsightsPageDTO(Long ownerId, Long businessId, String userSelection){
-        Business business = businessService.findBusinessByIdAndOwnerId(businessId, ownerId);
+        businessService.findBusinessByIdAndOwnerId(businessId, ownerId);
         return analyticsService.getInsightsPageData(businessId, userSelection);
     }
 

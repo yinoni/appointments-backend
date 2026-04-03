@@ -18,6 +18,13 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<?> handleAuthException(AuthenticationException ex) {
+        AuthErrorResponse authResponse = new AuthErrorResponse(ex.getMessage(), ex.getStatus(), ex.getField());
+
+        return new ResponseEntity<>(authResponse, ex.getStatus());
+    }
+
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<?> handleBaseException(BaseException ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), ex.getStatus());
@@ -53,4 +60,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(er, er.getStatus());
     }
 
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public  ResponseEntity<ErrorResponse> handleUsernameNotFound(UsernameNotFoundException ex){
+        String message = "Username or password incorrect!";
+        ErrorResponse er = new ErrorResponse(message, HttpStatus.UNAUTHORIZED);
+
+        return new ResponseEntity<>(er, er.getStatus());
+    }
 }

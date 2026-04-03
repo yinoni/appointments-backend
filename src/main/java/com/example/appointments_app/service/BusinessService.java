@@ -3,6 +3,8 @@ package com.example.appointments_app.service;
 import com.example.appointments_app.elasticsearch.ElasticSearchService;
 import com.example.appointments_app.exception.*;
 import com.example.appointments_app.kafka.BusinessProducer;
+import com.example.appointments_app.model.appointment.Appointment;
+import com.example.appointments_app.model.appointment.AppointmentDTO;
 import com.example.appointments_app.model.business.Business;
 import com.example.appointments_app.model.business.BusinessCategory;
 import com.example.appointments_app.model.business.BusinessDTO;
@@ -13,6 +15,7 @@ import com.example.appointments_app.model.schedule.ScheduleIn;
 import com.example.appointments_app.model.service.ServiceDTO;
 import com.example.appointments_app.model.service.ServiceIn;
 import com.example.appointments_app.model.user.User;
+import com.example.appointments_app.redis.Redis;
 import com.example.appointments_app.repo.AppointmentRepo;
 import com.example.appointments_app.repo.BusinessRepo;
 import com.example.appointments_app.repo.ServiceRepo;
@@ -20,6 +23,8 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
@@ -44,6 +49,9 @@ public class BusinessService {
     @Lazy
     private final ObjectMapper objectMapper;
     private final ModelMapper modelMapper;
+    @Lazy
+    private RedisTemplate redisTemplate;
+    private static final String BUSINESS_NAMES_SET = "all_business_names";
 
 
     public BusinessService(BusinessRepo businessRepo,
@@ -53,7 +61,8 @@ public class BusinessService {
                            ElasticSearchService elasticSearchService,
                            BusinessProducer businessProducer,
                            ObjectMapper objectMapper,
-                           ModelMapper modelMapper){
+                           ModelMapper modelMapper,
+                           RedisTemplate redisTemplate){
         this.businessRepo = businessRepo;
         this.appointmentRepo = appointmentRepo;
         this.userService = userService;
@@ -62,6 +71,7 @@ public class BusinessService {
         this.elasticSearchService = elasticSearchService;
         this.objectMapper = objectMapper;
         this.modelMapper = modelMapper;
+        this.redisTemplate = redisTemplate;
     }
 
     /***
@@ -79,15 +89,32 @@ public class BusinessService {
     }
 
     public Business updateBusiness(Long b_id, Long ownerId, BusinessInput businessInput){
-        Business business = findBusinessByIdAndOwnerId(b_id, ownerId);
+        Business prevBusiness = findBusinessByIdAndOwnerId(b_id, ownerId);
+        String prevName = prevBusiness.getBusinessName().trim().toLowerCase();
+        String newName = businessInput.getBusinessName().trim().toLowerCase();
 
-        modelMapper.map(businessInput, business);
+        if(!prevName.equals(newName)){
+            if(isBusinessNameExists(newName))
+                throw new BusinessException("Business name already exists", HttpStatus.CONFLICT);
+        }
 
-        business = save(business);
+        redisTemplate.opsForSet().remove(BUSINESS_NAMES_SET, prevName);
+        redisTemplate.opsForSet().add(BUSINESS_NAMES_SET, newName);
 
-        businessProducer.sendBusinessUpdatedEvent(business.convertToDTO());
+        modelMapper.map(businessInput, prevBusiness);
 
-        return business;
+        Business newBusiness = save(prevBusiness);
+
+        businessProducer.sendBusinessUpdatedEvent(newBusiness.convertToDTO());
+
+        return newBusiness;
+    }
+
+    public boolean isBusinessNameExists(String businessName){
+        String normalizedName = businessName.trim().toLowerCase();
+        Boolean isMember = redisTemplate.opsForSet().isMember(BUSINESS_NAMES_SET, normalizedName);
+
+        return Boolean.TRUE.equals(isMember);
     }
 
     /***
@@ -98,6 +125,11 @@ public class BusinessService {
      */
     @Transactional
     public BusinessDTO createBusiness(BusinessInput businessInput, Long ownerId){
+        String normalizedName = businessInput.getBusinessName().trim().toLowerCase();
+
+        if(isBusinessNameExists(businessInput.getBusinessName()))
+            throw new BusinessException("Business name already exists", HttpStatus.CONFLICT);
+
         User user = userService.findById(ownerId);
         BusinessDTO bDTO;
 
@@ -119,9 +151,15 @@ public class BusinessService {
         business = businessRepo.save(business);
         bDTO = business.convertToDTO();
 
+        redisTemplate.opsForSet().add(BUSINESS_NAMES_SET, normalizedName);
+
         businessProducer.sendBusinessCreatedEvent(bDTO);
 
         return  bDTO;
+    }
+
+    public boolean findByBusinessName(String businessName){
+        return businessRepo.findByBusinessName(businessName).isPresent();
     }
 
     /***
@@ -202,7 +240,7 @@ public class BusinessService {
         schedule = scheduleService.addNewSchedule(schedule);
 
         dto = schedule.convertToDTO();
-        dto.setAvailable_hours(scheduleService.getAvailableHours(schedule.getId()));
+        dto.setHours(scheduleService.getAvailableHours(schedule.getId()));
 
         return dto;
     }
@@ -245,13 +283,18 @@ public class BusinessService {
      * @param date - The date of the schedule
      * @return - The schedule of business {businessId} and with the date {date}
      */
-    public ScheduleDTO findScheduleByDateAndBusiness(Long businessId, LocalDate date) {
+    public ScheduleDTO findScheduleByDateAndBusiness(Long businessId, LocalDate date, int pageNum, int records) {
         findBusinessById(businessId);
         Schedule schedule = scheduleService.getScheduleByDate(businessId, date);
         ScheduleDTO dto = schedule.convertToDTO();
-        List<LocalTime> availableHours = scheduleService.getAvailableHours(schedule.getId());
+        Map<LocalTime, Boolean> availableHours = scheduleService.getAvailableHours(schedule.getId());
+        int finalRecords = records == -1 ? Integer.MAX_VALUE : records;
 
-        dto.setAvailable_hours(availableHours);
+        Page<Appointment> appointmentsPagination = appointmentRepo.getAppointmentsByScheduleId(schedule.getId(), PageRequest.of(pageNum, finalRecords));
+        List<AppointmentDTO> appointmentDTOS = appointmentsPagination.stream().map(Appointment::convertToDTO).toList();
+
+        dto.setHours(availableHours);
+        dto.setAppointments(appointmentDTOS);
 
         return dto;
     }

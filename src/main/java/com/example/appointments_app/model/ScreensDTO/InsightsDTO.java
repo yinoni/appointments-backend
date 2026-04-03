@@ -11,6 +11,9 @@ public class InsightsDTO {
     private int new_customers;
     private double rating;
     private List<ServicePerformanceDTO> servicesPerformance;
+    private double revenueGrowth;
+    private double bookingsGrowth;
+    private double newCustomersGrowth;
 
     public InsightsDTO() {
     }
@@ -20,6 +23,30 @@ public class InsightsDTO {
         this.bookings = bookings;
         this.rating = rating;
         this.new_customers = new_customers;
+    }
+
+    public double getRevenueGrowth() {
+        return revenueGrowth;
+    }
+
+    public void setRevenueGrowth(double revenueGrowth) {
+        this.revenueGrowth = revenueGrowth;
+    }
+
+    public double getBookingsGrowth() {
+        return bookingsGrowth;
+    }
+
+    public void setBookingsGrowth(double bookingsGrowth) {
+        this.bookingsGrowth = bookingsGrowth;
+    }
+
+    public double getNewCustomersGrowth() {
+        return newCustomersGrowth;
+    }
+
+    public void setNewCustomersGrowth(double newCustomersGrowth) {
+        this.newCustomersGrowth = newCustomersGrowth;
     }
 
     public List<RevenueData> getRevenueDataList() {
@@ -61,4 +88,6 @@ public class InsightsDTO {
     public void setServicesPerformance(List<ServicePerformanceDTO> servicesPerformance) {
         this.servicesPerformance = servicesPerformance;
     }
+
+
 }

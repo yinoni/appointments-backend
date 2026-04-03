@@ -16,6 +16,8 @@ public class BusinessInput {
     private String category;
     private String tagline;
     private List<ServiceIn> services;
+    private String country;
+    private String imageFile;
 
     public String getBusinessName() {
         return businessName;
@@ -73,6 +75,30 @@ public class BusinessInput {
         this.services = services;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(String imageFile) {
+        this.imageFile = imageFile;
+    }
+
     public Business toBusiness() {
         return aBusiness()
                 .withBusinessName(this.businessName)
@@ -85,6 +111,8 @@ public class BusinessInput {
                 .withServices(new ArrayList<>())
                 .withRating(2.5)
                 .withTagline(this.tagline)
+                .withCountry(BusinessCountry.fromString(this.country))
+                .withImageFile(this.imageFile)
                 .build();
     }
 }

@@ -37,7 +37,7 @@ public class BusinessController {
     }
 
 
-    /***
+    /**
      *
      * @param businessInput - The business input data (See BusinessIn class)
      * @param currentUser - The current user details from the JWT
@@ -50,7 +50,7 @@ public class BusinessController {
     }
 
 
-    /***
+    /**
      *
      * @param currentUser - The current user data from the JWT
      * @return - All the current user businesses
@@ -61,6 +61,11 @@ public class BusinessController {
         return new ResponseEntity<>(businessesDTO, HttpStatus.OK);
     }
 
+    @GetMapping("/exists")
+    public ResponseEntity<?> isExistsByName(@RequestParam String businessName){
+        return ResponseEntity.ok(businessService.findByBusinessName(businessName));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<?> searchBusiness(@RequestParam("text") String text){
         String result = businessService.searchBusiness(text);
@@ -68,7 +73,7 @@ public class BusinessController {
         return ResponseEntity.ok(result);
     }
 
-    /***
+    /**
      *
      * @param businessId - The business id
      * @param currentUser - The current user data from the JWT
@@ -82,7 +87,7 @@ public class BusinessController {
     }
 
 
-    /***
+    /**
      *
      * @param businessId - The business id
      * @param currentUser - The current user data from JWT
@@ -96,8 +101,7 @@ public class BusinessController {
         return ResponseEntity.ok(dto);
     }
 
-    /***
-     *
+    /**
      * @param businessId - The business id
      * @return - ALl the business schedules
      * @throws - BusinessException if the business is not exits
@@ -132,7 +136,7 @@ public class BusinessController {
      */
     @GetMapping("/{businessId}/schedule/byDate")
     public ResponseEntity<?> getScheduleByDate(@PathVariable Long businessId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
-        ScheduleDTO scheduleDTO = businessService.findScheduleByDateAndBusiness(businessId, date);
+        ScheduleDTO scheduleDTO = businessService.findScheduleByDateAndBusiness(businessId, date, 0, -1);
 
         return ResponseEntity.ok(scheduleDTO);
     }

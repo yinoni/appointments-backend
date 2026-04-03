@@ -2,6 +2,7 @@ package com.example.appointments_app.service;
 
 import co.elastic.clients.elasticsearch.nodes.Http;
 import com.example.appointments_app.exception.*;
+import com.example.appointments_app.jwt.JwtService;
 import com.example.appointments_app.kafka.UserProducer;
 import com.example.appointments_app.model.authentication.CustomUserDetails;
 import com.example.appointments_app.model.authentication.PhoneVerifyInput;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
@@ -35,15 +37,19 @@ public class UserService implements UserDetailsService {
     private final UserProducer userProducer;
     private final Redis redis;
     private final SecureRandom secureRandom = new SecureRandom();
+    public static final String LOGGED_OUT_SET_REDIS_KEY = "logged-out-users";
+    private final JwtService jwtService;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        UserProducer userProducer,
-                       Redis redis){
+                       Redis redis,
+                       JwtService jwtService){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userProducer = userProducer;
         this.redis = redis;
+        this.jwtService = jwtService;
     }
 
     public User findById(Long id){
@@ -68,7 +74,7 @@ public class UserService implements UserDetailsService {
             Optional<User> user = userRepository.findUserByEmail(userIn.getEmail());
             UserEventDTO dto;
             if(user.isPresent())
-                throw new com.example.appointments_app.exception.AuthenticationException("Email already exists!", HttpStatus.NOT_MODIFIED);
+                throw new com.example.appointments_app.exception.AuthenticationException("Email already exists!", HttpStatus.BAD_REQUEST, "email");
 
             newUser.setPassword(passwordEncoder.encode(userIn.getPassword()));
 
@@ -78,11 +84,11 @@ public class UserService implements UserDetailsService {
             userProducer.userRegisteredEvent(dto);
         }
         catch(AuthenticationException e){
-            throw new AuthenticationException("Email already exists!", HttpStatus.BAD_REQUEST);
+            throw new AuthenticationException("Email already exists!", HttpStatus.BAD_REQUEST, "email");
 
         }
         catch (Exception e){
-           throw  new AuthenticationException("Phone number is used!", HttpStatus.BAD_REQUEST);
+           throw  new AuthenticationException("Phone number is used!", HttpStatus.BAD_REQUEST, "phone");
         }
         return newUser;
     }
@@ -91,11 +97,12 @@ public class UserService implements UserDetailsService {
     public CustomUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User userEntity = userRepository.findUserByEmail(email)
                 .orElseThrow(() ->
-                        new AuthenticationException("User not found", HttpStatus.BAD_REQUEST));
+                        new AuthenticationException("User not found", HttpStatus.BAD_REQUEST, "emailOrPassword"));
 
         return new CustomUserDetails(
                 userEntity.getId(),
                 userEntity.getEmail(),
+                userEntity.getPhoneNumber(),
                 userEntity.getPassword(),
                 Collections.emptyList()
         );
@@ -149,6 +156,21 @@ public class UserService implements UserDetailsService {
     public String generateOTPCode(){
         int code = secureRandom.nextInt(10000);
         return String.format("%04d", code);
+    }
+
+    public long getRemainingTimeInSeconds(String token) {
+        Date expirationDate = jwtService.extractDate(token);
+        long now = System.currentTimeMillis();
+        long diff = expirationDate.getTime() - now;
+
+        // מחזירים בשניות (לשימוש ב-Redis)
+        return diff > 0 ? diff / 1000 : 0;
+    }
+
+    public void logout(String jwtToken){
+        long expiration = getRemainingTimeInSeconds(jwtToken);
+
+        redis.addToSet(LOGGED_OUT_SET_REDIS_KEY, jwtToken, expiration);
     }
 
 }

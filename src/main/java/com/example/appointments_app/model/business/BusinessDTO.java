@@ -16,6 +16,8 @@ public class BusinessDTO {
     private Double rating;
     private String tagline;
     private String category;
+    private String country;
+    private String imageFile;
 
 
     public BusinessDTO(){}
@@ -99,5 +101,21 @@ public class BusinessDTO {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(String imageFile) {
+        this.imageFile = imageFile;
     }
 }

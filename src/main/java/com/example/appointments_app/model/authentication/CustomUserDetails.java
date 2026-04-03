@@ -11,19 +11,23 @@ public class CustomUserDetails implements UserDetails {
     private Long id;
     private String email;
     private String password;
+    private String phoneNumber;
     private Collection<? extends GrantedAuthority> authorities;
 
 
-    public CustomUserDetails(Long id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public CustomUserDetails(Long id, String email, String phoneNumber, String password, Collection<? extends GrantedAuthority> authorities) {
         this.email = email;
         this.password = password;
         this.id = id;
         this.authorities = authorities;
+        this.phoneNumber = phoneNumber;
     }
+
 
     public Long getId() {
         return id;
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -40,7 +44,9 @@ public class CustomUserDetails implements UserDetails {
         return this.email;
     }
 
-
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
 
     // שאר המתודות של הממשק (חייב לממש את כולן)
     @Override public boolean isAccountNonExpired() { return true; }
