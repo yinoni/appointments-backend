@@ -17,23 +17,15 @@ public class ScheduleIn {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
-    @Min(1)
-    @Max(22)
-    private Integer startTime;
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime startTime;
 
-    @Min(2)
-    @Max(23)
-    private Integer endTime;
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime endTime;
 
     @Min(1)
     @Max(60)
     private Integer min_duration;
-
-    @AssertTrue(message = "End time must be after start time")
-    public boolean isValidTimeRange() {
-        if (startTime == null || endTime == null) return true;
-        return endTime > startTime;
-    }
 
     public LocalDate getDate() {
         return date;
@@ -43,19 +35,19 @@ public class ScheduleIn {
         this.date = date;
     }
 
-    public Integer getStartTime() {
+    public LocalTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Integer startTime) {
+    public void setStartTime(LocalTime startTime) {
         this.startTime = startTime;
     }
 
-    public Integer getEndTime() {
+    public LocalTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Integer endTime) {
+    public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
     }
 
@@ -68,18 +60,15 @@ public class ScheduleIn {
     }
 
     public Schedule toSchedule(){
-        LocalTime startTime = LocalTime.of(this.startTime, 0);
-        LocalTime endTime = LocalTime.of(this.endTime, 0);
-        List<LocalTime> available_hours = getAvailable_hours();
         return aSchedule()
                 .withDate(this.date)
-                .withStart_time(startTime)
-                .withEnd_time(endTime)
+                .withStart_time(this.startTime)
+                .withEnd_time(this.endTime)
                 .withMin_duration(this.min_duration)
-                //.withAvailable_hours(available_hours)
                 .build();
     }
 
+    /*
     public List<LocalTime> getAvailable_hours() {
         List<LocalTime> available_hours = new ArrayList<>();
 
@@ -91,5 +80,6 @@ public class ScheduleIn {
         available_hours.add(LocalTime.of(this.endTime, 0));
         return available_hours;
     }
+    */
 
 }

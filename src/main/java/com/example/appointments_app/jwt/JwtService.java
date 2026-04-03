@@ -27,6 +27,7 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("roles", userDetails.getAuthorities())
+                .claim("id", userDetails.getId())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(secretKey)
@@ -37,15 +38,27 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
+
+
     public boolean isTokenValid(String token, UserDetails user) {
         return extractUsername(token).equals(user.getUsername());
     }
 
+    public Date extractDate(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
     private <T> T extractClaim(String token, Function<Claims, T> resolver) {
+
+        String cleanToken = token;
+        if (token != null && token.startsWith("Bearer ")) {
+            cleanToken = token.substring(7).trim(); // חיתוך "Bearer " וניקוי רווחים בקצוות
+        }
+
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
-                .parseClaimsJws(token)
+                .parseClaimsJws(cleanToken)
                 .getBody();
 
         return resolver.apply(claims);

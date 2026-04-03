@@ -2,19 +2,15 @@ package com.example.appointments_app.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class AuthenticationException extends BaseException{
+public class AuthErrorResponse extends ErrorResponse{
     private String field;
 
-    public AuthenticationException(String message, HttpStatus status, String field) {
+    public AuthErrorResponse(String message, HttpStatus status, String field) {
         super(message, status);
         this.field = field;
     }
 
     public String getField() {
         return field;
-    }
-
-    public void setField(String field) {
-        this.field = field;
     }
 }

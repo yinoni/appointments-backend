@@ -12,6 +12,8 @@ import java.util.Optional;
 
 public interface BusinessRepo extends CrudRepository<Business, Long> {
 
+    Optional<Business> findByBusinessName(String businessName);
+
     @Query("SELECT b FROM Business b WHERE b.owner.id = :ownerId")
     List<Business> findAllByOwnerId(@Param("ownerId") Long ownerId);
 

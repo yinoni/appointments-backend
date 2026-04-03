@@ -27,7 +27,7 @@ public class ServiceController {
      * @return - This function adds new service to the business
      * @throws  - BusinessException if the business is not exists
      */
-    @PostMapping("/addService")
+    @PostMapping("")
     public ResponseEntity<?> addService(@Valid @RequestBody ServiceIn serviceIn , @AuthenticationPrincipal CustomUserDetails currentUser){
         ServiceDTO dto = serviceService.addNewService(serviceIn, currentUser.getId());
         return ResponseEntity.ok(dto);
@@ -42,8 +42,8 @@ public class ServiceController {
      */
     @PostMapping("/removeService")
     public ResponseEntity<?> removeService(@Valid @RequestBody ServiceRemoveRequest request, @AuthenticationPrincipal CustomUserDetails currentUser){
-        serviceService.removeService(request, currentUser.getId());
-        return ResponseEntity.ok("The service with id: " + request.getServiceId() + " has deleted successfully!");
+        ServiceDTO dto = serviceService.removeService(request, currentUser.getId());
+        return ResponseEntity.ok(dto);
     }
 
     @PutMapping("/{serviceId}")

@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("schedule")
+@RequestMapping("/schedule")
 public class ScheduleController {
 
 
@@ -22,9 +23,14 @@ public class ScheduleController {
 
     @GetMapping("/{scheduleId}/available_hours")
     public ResponseEntity<?> getAvailableHours(@PathVariable("scheduleId") Long scheduleId){
-        List<LocalTime> hours = scheduleService.getAvailableHours(scheduleId);
+        Map<LocalTime, Boolean> hours = scheduleService.getAvailableHours(scheduleId);
 
         return ResponseEntity.ok(hours);
+    }
+
+    @PostMapping("/{scheduleID}/toggle-hour-bit")
+    public void toggleHourBit(@PathVariable("scheduleID") Long scheduleId, @RequestBody LocalTime hour){
+        scheduleService.toggleHourSlot(scheduleId, hour);
     }
 
 }

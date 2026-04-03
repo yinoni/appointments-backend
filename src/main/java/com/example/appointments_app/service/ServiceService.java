@@ -78,7 +78,7 @@ public class ServiceService {
      * @param ownerId - The owner id
      * @return - DTO of the service that just deleted
      */
-    public void removeService(ServiceRemoveRequest request, Long ownerId) {
+    public ServiceDTO removeService(ServiceRemoveRequest request, Long ownerId) {
         // 1. מציאת העסק
         Business business = businessService.findBusinessByIdAndOwnerId(request.getBusinessId(), ownerId);
 
@@ -92,6 +92,8 @@ public class ServiceService {
 
         // 3. שמירת העסק - בזכות orphanRemoval=true, ה-Service יימחק מה-DB אוטומטית!
         businessService.save(business);
+
+        return service.convertToDTO();
     }
 
 }

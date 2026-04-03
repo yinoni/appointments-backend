@@ -61,7 +61,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             }
         }
 
-        CustomUserDetails userDetails = new CustomUserDetails(finalUser.getId(), finalUser.getEmail(), finalUser.getPassword(), Collections.emptyList());
+        CustomUserDetails userDetails = new CustomUserDetails(finalUser.getId(), finalUser.getEmail(), finalUser.getPhoneNumber(), finalUser.getPassword(), Collections.emptyList());
 
         String token = jwtService.generateToken(userDetails);
         getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/login-success?token=" + token);

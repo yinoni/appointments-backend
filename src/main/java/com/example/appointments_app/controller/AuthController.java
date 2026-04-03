@@ -4,17 +4,20 @@ import com.example.appointments_app.jwt.JwtService;
 import com.example.appointments_app.model.authentication.AuthRequest;
 import com.example.appointments_app.model.authentication.CustomUserDetails;
 import com.example.appointments_app.model.authentication.PhoneVerifyInput;
+import com.example.appointments_app.model.user.User;
 import com.example.appointments_app.model.user.UserIn;
 import com.example.appointments_app.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/authenticate")
@@ -28,6 +31,11 @@ public class AuthController {
         this.userService = userService;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> temp(){
+        return ResponseEntity.ok("OK");
     }
 
     @PostMapping("")
@@ -55,9 +63,12 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserIn userIn){
-        userService.register(userIn);
+        User userRes = userService.register(userIn);
+        CustomUserDetails userDetails = new CustomUserDetails(userRes.getId(), userRes.getEmail(), userRes.getPhoneNumber(), userRes.getPassword(), new ArrayList<>());
 
-        return ResponseEntity.ok("The user registered successfully");
+        String token = jwtService.generateToken(userDetails);
+
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping("/phone-verify")
@@ -67,8 +78,8 @@ public class AuthController {
     }
 
     @PostMapping("/resend-code")
-    public ResponseEntity<?> resendCode(@RequestBody String phoneNumber){
-        userService.resendOtpCode(phoneNumber);
+    public ResponseEntity<?> resendCode(@AuthenticationPrincipal CustomUserDetails userDetails){
+        userService.resendOtpCode(userDetails.getPhoneNumber());
         return ResponseEntity.ok("OK");
     }
 

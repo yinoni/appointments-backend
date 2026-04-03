@@ -4,6 +4,7 @@ import com.example.appointments_app.exception.ScheduleNotFoundException;
 import com.example.appointments_app.model.schedule.Schedule;
 import com.example.appointments_app.redis.Redis;
 import com.example.appointments_app.repo.ScheduleRepo;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable; // בשביל הפרמטר
 import org.springframework.data.domain.PageRequest; // בשביל יצירת הבקשה
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ScheduleService {
@@ -57,13 +59,31 @@ public class ScheduleService {
         return scheduleRepo.getSchedulesByBusinessId(b_id, pageable);
     }
 
-    public List<LocalTime> getAvailableHours(Long scheduleId){
+    public Map<LocalTime, Boolean> getAvailableHours(Long scheduleId){
         Schedule schedule = findById(scheduleId);
         long startOffset = redis.getOffset(schedule.getStart_time());
         long endOffset = redis.getOffset(schedule.getEnd_time());
 
-        List<LocalTime> availableHours = redis.getHoursFromOffsetRange(schedule.getKey(), startOffset, endOffset, schedule.getMin_duration());
+        Map<LocalTime, Boolean> availableHours = redis.getHoursFromOffsetRange(schedule.getKey(), startOffset, endOffset, schedule.getMin_duration());
 
         return availableHours;
     }
+
+    public void toggleHourSlot(Long scheduleId, LocalTime hour){
+        Schedule schedule = findById(scheduleId);
+        String key = schedule.getBusiness().getId() + ":" + schedule.getId() + ":" + schedule.getDate();
+
+        redis.toggleBit(key, hour);
+
+    }
+/*
+    public Map<LocalTime, Boolean> getHours(Long scheduleId){
+        Schedule schedule = findById(scheduleId);
+        long startOffset = redis.getOffset(schedule.getStart_time());
+        long endOffset = redis.getOffset(schedule.getEnd_time());
+
+
+    }
+    */
+
 }

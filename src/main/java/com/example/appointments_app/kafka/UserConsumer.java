@@ -42,8 +42,8 @@ public class UserConsumer {
         try{
             UserEventDTO dto = om.readValue(event, UserEventDTO.class);
 
-            System.out.println(OTP_MESSAGE + privateCode);
-            System.out.println("Sending code -> " + privateCode + " To: " + dto.getPhone());
+            //smsService.sendSMS(dto.getPhone(), OTP_MESSAGE + privateCode);
+            System.out.println(privateCode);
             redis.saveOtp(dto.getPhone(), privateCode);
         }
         catch (Exception e){
@@ -68,7 +68,8 @@ public class UserConsumer {
         try{
             OtpTaskCode otpCode = om.readValue(event, OtpTaskCode.class);
             String message = OTP_MESSAGE + otpCode.getCode();
-            smsService.sendSMS(otpCode.getPhone(), message);
+            //smsService.sendSMS(otpCode.getPhone(), message);
+            System.out.println(message);
         }
         catch (Exception e){
             log.error(e.getMessage());

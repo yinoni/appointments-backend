@@ -11,7 +11,7 @@ public class AuthService {
 
     public String login(AuthRequest request){
         if(!request.getEmail().equals("y@dev.com") && request.getPassword().equals("12345"))
-            throw new AuthenticationException("Username or password incorrect!", HttpStatus.BAD_REQUEST);
+            throw new AuthenticationException("Username or password incorrect!", HttpStatus.BAD_REQUEST, "usernameOrPassword");
 
         return "logged in as " + request.getEmail();
     }

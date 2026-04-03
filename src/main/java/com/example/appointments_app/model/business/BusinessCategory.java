@@ -1,11 +1,14 @@
 package com.example.appointments_app.model.business;
 
 public enum BusinessCategory {
-    HAIR_SALON("מספרה"),
-    BEAUTY_CLINIC("מכון יופי"),
-    MEDICAL_CENTER("מרפאה"),
-    GYM("חדר כושר"),
-    SPA("ספא");
+    HAIR_SALON("Hair Salon"),
+    BEAUTY_CLINIC( "Beauty Clinic"),
+    MEDICAL_CENTER("Medical Center"),
+    GYM("Gym"),
+    SPA("SPA"),
+    MECHANIC("Mechanic"),
+    FOOD("Food"),
+    LIFESTYLE("Lifestyle");
 
     private final String displayName;
 
