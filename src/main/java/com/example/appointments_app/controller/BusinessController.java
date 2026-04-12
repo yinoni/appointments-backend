@@ -3,11 +3,13 @@ package com.example.appointments_app.controller;
 import com.example.appointments_app.model.authentication.CustomUserDetails;
 import com.example.appointments_app.model.business.BusinessDTO;
 import com.example.appointments_app.model.business.BusinessInput;
+import com.example.appointments_app.model.business.BusinessSearchRequest;
 import com.example.appointments_app.model.schedule.ScheduleDTO;
 import com.example.appointments_app.model.schedule.ScheduleIn;
 import com.example.appointments_app.service.BusinessService;
 import com.example.appointments_app.service.ScheduleService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,11 +68,12 @@ public class BusinessController {
         return ResponseEntity.ok(businessService.findByBusinessName(businessName));
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<?> searchBusiness(@RequestParam("text") String text){
-        String result = businessService.searchBusiness(text);
 
-        return ResponseEntity.ok(result);
+    @PostMapping("/search")
+    public ResponseEntity<?> searchBusiness(@RequestBody BusinessSearchRequest businessSearchRequest){
+       List<BusinessDTO> dto = businessService.searchBusiness(businessSearchRequest);
+
+        return ResponseEntity.ok(dto);
     }
 
     /**

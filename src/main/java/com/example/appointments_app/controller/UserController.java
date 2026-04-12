@@ -2,6 +2,7 @@ package com.example.appointments_app.controller;
 
 import com.example.appointments_app.model.authentication.CustomUserDetails;
 import com.example.appointments_app.model.user.UserDTO;
+import com.example.appointments_app.model.user.UserUpdateRequest;
 import com.example.appointments_app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,13 @@ public class UserController {
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String token){
         userService.logout(token);
         return ResponseEntity.ok("Success");
+    }
+
+    @PutMapping("")
+    public ResponseEntity<?> updateUser(@RequestBody UserUpdateRequest userUpdateRequest, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        UserDTO dto = userService.updateUser(userUpdateRequest, customUserDetails.getId());
+
+        return ResponseEntity.ok(dto);
     }
 
 }

@@ -29,6 +29,7 @@ public class S3Service {
 
     @Value("${aws.bucketName}")
     private String bucketName;
+    private final String S3_BUCKET_PATH = "assets/pics/";
 
     public S3Service(S3Presigner s3Presigner) {
         this.s3Presigner = s3Presigner;
@@ -55,7 +56,7 @@ public class S3Service {
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key("assets/pics/" + finalFileName)
+                .key(S3_BUCKET_PATH + finalFileName)
                 .contentType(fileType)
                 .build();
 

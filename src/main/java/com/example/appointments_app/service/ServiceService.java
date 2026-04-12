@@ -2,6 +2,7 @@ package com.example.appointments_app.service;
 
 import com.example.appointments_app.exception.BusinessException;
 import com.example.appointments_app.exception.ServiceNotFoundException;
+import com.example.appointments_app.kafka.BusinessProducer;
 import com.example.appointments_app.model.business.Business;
 import com.example.appointments_app.model.service.ServiceDTO;
 import com.example.appointments_app.model.service.ServiceIn;
@@ -17,10 +18,12 @@ public class ServiceService {
 
     private final ServiceRepo serviceRepo;
     private final BusinessService businessService;
+    private final BusinessProducer businessProducer;
 
-    public ServiceService(ServiceRepo serviceRepo, BusinessService businessService){
+    public ServiceService(ServiceRepo serviceRepo, BusinessService businessService, BusinessProducer businessProducer){
         this.serviceRepo = serviceRepo;
         this.businessService = businessService;
+        this.businessProducer = businessProducer;
     }
 
 
@@ -67,7 +70,7 @@ public class ServiceService {
 
         business.getServices().add(service);
 
-        businessService.save(business);
+        businessProducer.sendBusinessUpdatedEvent(businessService.save(business).convertToDTO());
 
         return service.convertToDTO();
     }
@@ -90,8 +93,7 @@ public class ServiceService {
 
         business.getServices().removeIf(s -> s.getId().equals(request.getServiceId()));
 
-        // 3. שמירת העסק - בזכות orphanRemoval=true, ה-Service יימחק מה-DB אוטומטית!
-        businessService.save(business);
+        businessProducer.sendBusinessUpdatedEvent(businessService.save(business).convertToDTO());
 
         return service.convertToDTO();
     }
