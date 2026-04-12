@@ -49,4 +49,11 @@ public class BusinessConsumer {
             System.out.println(e.getMessage());
         }
     }
+
+    @KafkaListener(topics = "business-deleted", groupId = "appointments-group-final-1")
+    public void businessDeletedEvent(String event) {
+        BusinessDTO businessDTO = om.readValue(event, BusinessDTO.class);
+        elasticSearchService.removeDocument("businesses", String.valueOf(businessDTO.getId()));
+
+    }
 }

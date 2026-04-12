@@ -5,10 +5,7 @@ import com.example.appointments_app.exception.*;
 import com.example.appointments_app.kafka.BusinessProducer;
 import com.example.appointments_app.model.appointment.Appointment;
 import com.example.appointments_app.model.appointment.AppointmentDTO;
-import com.example.appointments_app.model.business.Business;
-import com.example.appointments_app.model.business.BusinessCategory;
-import com.example.appointments_app.model.business.BusinessDTO;
-import com.example.appointments_app.model.business.BusinessInput;
+import com.example.appointments_app.model.business.*;
 import com.example.appointments_app.model.schedule.Schedule;
 import com.example.appointments_app.model.schedule.ScheduleDTO;
 import com.example.appointments_app.model.schedule.ScheduleIn;
@@ -21,6 +18,8 @@ import com.example.appointments_app.repo.BusinessRepo;
 import com.example.appointments_app.repo.ServiceRepo;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +39,7 @@ import static com.example.appointments_app.model.business.BusinessBuilder.aBusin
 @Service
 public class BusinessService {
 
+    private static final Logger log = LoggerFactory.getLogger(BusinessService.class);
     private final BusinessRepo businessRepo;
     private final AppointmentRepo appointmentRepo;
     private final UserService userService;
@@ -52,6 +52,7 @@ public class BusinessService {
     @Lazy
     private RedisTemplate redisTemplate;
     private static final String BUSINESS_NAMES_SET = "all_business_names";
+    private static final int PAGE_SIZE = 10;
 
 
     public BusinessService(BusinessRepo businessRepo,
@@ -184,14 +185,50 @@ public class BusinessService {
         return businesses.stream().map(Business::convertToDTO).toList();
     }
 
-    public String searchBusiness(String text){
-        String s = "";
+    public List<BusinessDTO> searchBusiness(BusinessSearchRequest businessSearchRequest){
+        ObjectMapper mapper = new ObjectMapper();
+        String query = businessSearchRequest.getQuery();
+        int from = businessSearchRequest.getFrom();
+        List<BusinessDTO> businesses = new ArrayList<>();
+
         try{
-             s = elasticSearchService.search("businesses", text);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+            List<Map<String, Object>> mustList = new ArrayList<>();
+            if (query != null && !query.isEmpty()) {
+                mustList.add(Map.of("multi_match", Map.of(
+                        "query", query,
+                        "fields", List.of("businessName", "category")
+                )));
+            } else {
+                mustList.add(Map.of("match_all", Map.of())); // אם אין שאילתה, שלוף הכל
+            }
+
+            Map<String, Object> boolQuery = new HashMap<>();
+            boolQuery.put("must", mustList);
+
+            if(businessSearchRequest.getFilters() != null)
+                boolQuery.put("filter", businessSearchRequest.getFilters().generateFilterList());
+
+            Map<String, Object> root = new HashMap<>();
+            root.put("from", from * PAGE_SIZE);
+            root.put("size", PAGE_SIZE);
+            root.put("query", Map.of("bool", boolQuery));
+            root.put("sort", List.of(Map.of("rating", "asc")));
+
+            String jsonBody = mapper.writeValueAsString(root);
+
+            String res = elasticSearchService.aggregate("businesses", jsonBody);
+
+            JsonNode hits = fetchSearchResult(res);
+
+            for(JsonNode node : hits){
+                businesses.add(objectMapper.treeToValue(node.path("_source"), BusinessDTO.class));
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
-        return s;
+
+        return businesses;
+
     }
 
 
@@ -215,6 +252,10 @@ public class BusinessService {
         bDTO = business.convertToDTO();
 
         businessRepo.deleteById(businessId);
+
+        redisTemplate.opsForSet().remove(BUSINESS_NAMES_SET, business.getBusinessName());
+
+        businessProducer.sendBusinessDeletedEvent(bDTO);
 
         return bDTO;
     }
@@ -345,6 +386,13 @@ public class BusinessService {
         }
 
         return businessDTOS;
+    }
 
+    public JsonNode fetchSearchResult(String res){
+        List<Object> object = new ArrayList<>();
+        JsonNode root = objectMapper.readTree(res);
+        JsonNode hits = root.path("hits").path("hits");
+
+        return hits;
     }
 }

@@ -24,4 +24,6 @@ public interface BusinessRepo extends CrudRepository<Business, Long> {
     @Transactional
     @Query(value = "DELETE FROM businesses_services WHERE business_id = :businessId", nativeQuery = true)
     void deleteBusinessAssociations(@Param("businessId") Long businessId);
+
+
 }

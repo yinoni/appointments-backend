@@ -7,14 +7,13 @@ import com.example.appointments_app.kafka.UserProducer;
 import com.example.appointments_app.model.authentication.CustomUserDetails;
 import com.example.appointments_app.model.authentication.PhoneVerifyInput;
 import com.example.appointments_app.model.business.Business;
-import com.example.appointments_app.model.user.OtpTaskCode;
-import com.example.appointments_app.model.user.User;
-import com.example.appointments_app.model.user.UserEventDTO;
-import com.example.appointments_app.model.user.UserIn;
+import com.example.appointments_app.model.user.*;
 import com.example.appointments_app.redis.Redis;
 import com.example.appointments_app.repo.BusinessRepo;
 import com.example.appointments_app.repo.UserRepository;
 import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -39,17 +38,21 @@ public class UserService implements UserDetailsService {
     private final SecureRandom secureRandom = new SecureRandom();
     public static final String LOGGED_OUT_SET_REDIS_KEY = "logged-out-users";
     private final JwtService jwtService;
+    @Lazy
+    private final ModelMapper modelMapper;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        UserProducer userProducer,
                        Redis redis,
-                       JwtService jwtService){
+                       JwtService jwtService,
+                       ModelMapper modelMapper){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userProducer = userProducer;
         this.redis = redis;
         this.jwtService = jwtService;
+        this.modelMapper = modelMapper;
     }
 
     public User findById(Long id){
@@ -91,6 +94,23 @@ public class UserService implements UserDetailsService {
            throw  new AuthenticationException("Phone number is used!", HttpStatus.BAD_REQUEST, "phone");
         }
         return newUser;
+    }
+
+    /**
+     *
+     * @param userUpdateRequest - The fields to update
+     * @return - The updated user
+     */
+    public UserDTO updateUser(UserUpdateRequest userUpdateRequest, Long userID){
+        User prevUser = this.findById(userID);
+
+        /*
+         * TODO: Verify that the update fields are not equals to the current value of those fields from the prevUser object
+         */
+
+        modelMapper.map(userUpdateRequest, prevUser);
+
+        return saveUser(prevUser).convertToUserDTO();
     }
 
     @Override

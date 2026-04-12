@@ -1,6 +1,7 @@
 package com.example.appointments_app.elasticsearch;
 
 import com.example.appointments_app.model.data_aggregation.RevenueData;
+import jakarta.validation.Valid;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,6 +92,28 @@ public class ElasticSearchService {
         }
     }
 
+    public String search(String index, String query, int from, int size) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(ELASTIC_URL)
+                .append("/")
+                .append(index)
+                .append("/_search?size=")
+                .append(size)
+                .append("&from=")
+                .append(from);
+
+        if (query != null && !query.trim().isEmpty()) {
+            urlBuilder.append("&q=").append(query);
+        }
+        Request request = new Request.Builder()
+                .url(urlBuilder.toString())
+                .get()
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            return response.body().string();
+        }
+    }
+
     /***
      *
      * @param index - The index in the elasticsearch
@@ -117,5 +140,21 @@ public class ElasticSearchService {
         }
 
         return "{}";
+    }
+
+    public void removeDocument(String index, String id){
+        Request request = new Request.Builder()
+                .url(ELASTIC_URL + "/" + index + "/_doc/" + id)
+                .delete()
+                .build();
+
+        try(Response res = client.newCall(request).execute()){
+            if (res.isSuccessful() && res.body() != null) {
+                log.info("Document deleted successfully!");
+            }
+
+        } catch (IOException e) {
+            log.info(e.getMessage());
+        }
     }
 }
