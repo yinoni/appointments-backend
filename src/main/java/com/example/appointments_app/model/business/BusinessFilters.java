@@ -60,11 +60,12 @@ public class BusinessFilters {
             filters.add(Map.of("term", Map.of("country.keyword", this.country)));
 
         if(this.address != null && !this.address.trim().isEmpty())
-            filters.add(Map.of("term", Map.of("address.keyword", this.country)));
+            filters.add(Map.of("term", Map.of("address.keyword", this.address)));
 
-        if(this.category != null && !this.category.trim().isEmpty())
-            filters.add(Map.of("term", Map.of("category.keyword", this.country)));
-
+        if((this.category != null && !this.category.trim().isEmpty())) {
+            if(!this.category.toUpperCase().equals("ALL"))
+                filters.add(Map.of("term", Map.of("category.keyword", this.category)));
+        }
         if(this.rating != null)
             filters.add(Map.of("range", Map.of("rating", Map.of("gte", this.rating))));
 
