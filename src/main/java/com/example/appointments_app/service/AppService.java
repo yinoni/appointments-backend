@@ -110,7 +110,7 @@ public class AppService {
     @Transactional
     public boolean toggleFavorite(Long userId, Long businessId){
         User user = userRepository.findById(userId).orElseThrow(() ->
-                new UserNotFoundException("The user not found!", HttpStatus.BAD_REQUEST));
+                new UserNotFoundException("The user not found!", HttpStatus.NOT_FOUND));
         Business business = businessService.findBusinessById(businessId);
         Set<Business> favorites = user.getSavedBusinesses();
         boolean inserted = false;
@@ -125,15 +125,6 @@ public class AppService {
 
         userRepository.save(user);
         return inserted;
-    }
-
-
-    public Set<BusinessDTO> getSavedBusinesses(Long userID, Integer page){
-        Page pageResponse = userRepository.findSavedBusinessesByUserId(userID, PageRequest.of(page, 10));
-
-        Set<BusinessDTO> businessDTOS = (Set<BusinessDTO>) pageResponse.map(b -> ((Business) b).convertToDTO()).stream().collect(Collectors.toSet());
-
-        return businessDTOS;
     }
 
     

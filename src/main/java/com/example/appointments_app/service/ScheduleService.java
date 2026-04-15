@@ -66,6 +66,8 @@ public class ScheduleService {
 
         Map<LocalTime, Boolean> availableHours = redis.getHoursFromOffsetRange(schedule.getKey(), startOffset, endOffset, schedule.getMin_duration());
 
+
+
         return availableHours;
     }
 

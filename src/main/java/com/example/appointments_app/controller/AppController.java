@@ -40,15 +40,8 @@ public class AppController {
         return ResponseEntity.ok(insightsDTO);
     }
 
-    @PostMapping("/toggle_favorite/{businessID}")
+    @PostMapping("/favorite/{businessID}")
     public ResponseEntity<?> toggleFavoriteBusiness(@PathVariable("businessID") Long businessID, @AuthenticationPrincipal CustomUserDetails userDetails){
         return ResponseEntity.ok(appService.toggleFavorite(userDetails.getId(), businessID));
-    }
-
-    @GetMapping("/saved_businesses")
-    public ResponseEntity<?> getSavedBusinesses(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam Integer page){
-        Set<BusinessDTO> businessDTOSet = appService.getSavedBusinesses(userDetails.getId(), page);
-
-        return ResponseEntity.ok(businessDTOSet);
     }
 }

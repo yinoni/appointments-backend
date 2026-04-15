@@ -45,15 +45,15 @@ public class AppointmentService {
         this.appointmentProducer = appointmentProducer;
     }
 
-    public Appointment insertAppointment(AppointmentIn appointmentIn) {
+    public Appointment insertAppointment(AppointmentIn appointmentIn, Long userID) {
         Appointment app = appointmentIn.toAppointment();
         Schedule schedule = scheduleService.findById(appointmentIn.getScheduleId());
         com.example.appointments_app.model.service.Service service = serviceService.findById(appointmentIn.getServiceId());
-        User user = userService.findByPhone(appointmentIn.getPhone());
+        User user = userService.findById(userID);
         AppointmentEventDTO event;
 
         if(schedule.getBusiness().getId() != service.getBusiness().getId())
-            throw new BusinessException("The business doesn't have the schedule or the service!", HttpStatus.BAD_REQUEST);
+            throw new BusinessException("The business doesn't have this schedule or this service!", HttpStatus.BAD_REQUEST);
 
         app.setSchedule(schedule);
         app.setService(service);
@@ -64,7 +64,7 @@ public class AppointmentService {
 
         app = appointmentRepo.save(app);
 
-        boolean newCustomer = appointmentRepo.existsByCustomerPhone(appointmentIn.getPhone());
+        boolean newCustomer = appointmentRepo.existsByCustomerPhone(user.getPhoneNumber());
 
         event = new AppointmentEventDTO(
                 schedule.getBusiness().getId(),
