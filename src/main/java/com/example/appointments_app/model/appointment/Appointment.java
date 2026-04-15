@@ -91,6 +91,9 @@ public class Appointment {
         dto.setTime(this.time);
         dto.setService(this.service.convertToDTO());
         dto.setUser(this.user.convertToUserDTO());
+        dto.setDate(this.schedule.getDate());
+
+        dto.setBusinessName(this.schedule.getBusiness().getBusinessName());
 
         return dto;
     }

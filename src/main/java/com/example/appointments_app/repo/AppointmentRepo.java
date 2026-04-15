@@ -40,7 +40,7 @@ public interface AppointmentRepo extends CrudRepository<Appointment, Long> {
     @Query("SELECT a FROM Appointment a " +
             "WHERE a.user.id = :userId " +
             "AND a.schedule.date > :date OR (a.schedule.date = :date AND a.time >= :time) " +
-            "ORDER BY a.schedule.date ASC")
+            "ORDER BY a.schedule.date ASC, a.time ASC")
     Page<Appointment> getUpcomingAppointments(@Param("date")LocalDate date,
                                               @Param("userId") Long userId,
                                               @Param("time") LocalTime time,
