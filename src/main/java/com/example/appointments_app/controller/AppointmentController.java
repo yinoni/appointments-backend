@@ -23,8 +23,8 @@ public class AppointmentController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> addNewAppointment(@RequestBody AppointmentIn appointmentIn) {
-        AppointmentDTO dto = appointmentService.insertAppointment(appointmentIn).convertToDTO();
+    public ResponseEntity<?> addNewAppointment(@RequestBody AppointmentIn appointmentIn, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        AppointmentDTO dto = appointmentService.insertAppointment(appointmentIn, customUserDetails.getId()).convertToDTO();
 
         return ResponseEntity.ok(dto);
     }

@@ -10,8 +10,6 @@ public class AppointmentIn {
     private Long serviceId;
     @JsonFormat(pattern = "HH:mm")
     LocalTime time;
-    private String fullName;
-    private String phone;
     private Long scheduleId;
 
     public AppointmentIn() {
@@ -33,21 +31,6 @@ public class AppointmentIn {
         this.time = time;
     }
 
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
 
     public Long getScheduleId() {
         return scheduleId;

@@ -112,7 +112,7 @@ public class Redis {
 
     public Map<LocalTime, Boolean> getHoursFromOffsetRange(String key, long start, long end, int min_duration){
         List<LocalTime> availableHours = new ArrayList<>();
-        Map<LocalTime, Boolean> hoursMap = new HashMap<>();
+        Map<LocalTime, Boolean> hoursMap = new TreeMap<>();
 
         for(long i = start; i<=end; i+=(min_duration / DAY_DIVIDER)){
             LocalTime temp = offsetToLocalTime(min_duration, i);
