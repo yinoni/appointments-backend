@@ -7,6 +7,7 @@ import com.example.appointments_app.kafka.UserProducer;
 import com.example.appointments_app.model.authentication.CustomUserDetails;
 import com.example.appointments_app.model.authentication.PhoneVerifyInput;
 import com.example.appointments_app.model.business.Business;
+import com.example.appointments_app.model.business.BusinessDTO;
 import com.example.appointments_app.model.user.*;
 import com.example.appointments_app.redis.Redis;
 import com.example.appointments_app.repo.BusinessRepo;
@@ -14,6 +15,8 @@ import com.example.appointments_app.repo.UserRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,6 +28,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.example.appointments_app.redis.Redis.OTP_PREFIX;
 
@@ -40,6 +44,8 @@ public class UserService implements UserDetailsService {
     private final JwtService jwtService;
     @Lazy
     private final ModelMapper modelMapper;
+
+    private final int SAVED_BUSINESSES_NUMBER = 10;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
@@ -191,6 +197,14 @@ public class UserService implements UserDetailsService {
         long expiration = getRemainingTimeInSeconds(jwtToken);
 
         redis.addToSet(LOGGED_OUT_SET_REDIS_KEY, jwtToken, expiration);
+    }
+
+    public Set<BusinessDTO> getSavedBusinesses(Long userID, Integer page){
+        Page pageResponse = userRepository.findSavedBusinessesByUserId(userID, PageRequest.of(page, SAVED_BUSINESSES_NUMBER));
+
+        Set<BusinessDTO> businessDTOS = (Set<BusinessDTO>) pageResponse.map(b -> ((Business) b).convertToDTO()).stream().collect(Collectors.toSet());
+
+        return businessDTOS;
     }
 
 }
