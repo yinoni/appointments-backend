@@ -26,8 +26,8 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token){
-        userService.logout(token);
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        userService.logout(token, customUserDetails.getId());
         return ResponseEntity.ok("Success");
     }
 
@@ -43,6 +43,19 @@ public class UserController {
         Set<BusinessDTO> businessDTOSet = userService.getSavedBusinesses(userDetails.getId(), page);
 
         return ResponseEntity.ok(businessDTOSet);
+    }
+
+    @GetMapping("/get-view-state")
+    public ResponseEntity<?> getViewState(@AuthenticationPrincipal CustomUserDetails userDetails){
+        String currentView = userService.getViewState(userDetails.getId());
+
+        return ResponseEntity.ok(currentView);
+    }
+
+    @PostMapping("/toggle-view-state")
+    public ResponseEntity<?> changeViewState(@AuthenticationPrincipal CustomUserDetails userDetails){
+        String currentView = userService.changeViewState(userDetails.getId());
+        return ResponseEntity.ok(currentView);
     }
 
 }

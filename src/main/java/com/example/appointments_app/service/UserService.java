@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.example.appointments_app.redis.Redis.OTP_PREFIX;
@@ -41,6 +42,8 @@ public class UserService implements UserDetailsService {
     private final Redis redis;
     private final SecureRandom secureRandom = new SecureRandom();
     public static final String LOGGED_OUT_SET_REDIS_KEY = "logged-out-users";
+    public static final String VIEW_STATE_REDIS_KEY = "view-state:";
+    public static final String CLIENT_VIEW = "customer", OWNER_VIEW = "business";
     private final JwtService jwtService;
     @Lazy
     private final ModelMapper modelMapper;
@@ -195,7 +198,7 @@ public class UserService implements UserDetailsService {
         return diff > 0 ? diff / 1000 : 0;
     }
 
-    public void logout(String jwtToken){
+    public void logout(String jwtToken, Long userId){
         long expiration = getRemainingTimeInSeconds(jwtToken);
 
         redis.addToSet(LOGGED_OUT_SET_REDIS_KEY, jwtToken, expiration);
@@ -207,6 +210,32 @@ public class UserService implements UserDetailsService {
         Set<BusinessDTO> businessDTOS = (Set<BusinessDTO>) pageResponse.map(b -> ((Business) b).convertToDTO()).stream().collect(Collectors.toSet());
 
         return businessDTOS;
+    }
+
+    //Returns the current view state of the app (Customer or business owner)
+    public String getViewState(Long userId){
+        String redisKey = VIEW_STATE_REDIS_KEY + userId;
+        Object currentState = redis.getKey(redisKey);
+
+        if(currentState != null)
+            return currentState.toString();
+
+        else
+            return CLIENT_VIEW;
+    }
+
+    //Toggles the view state of the app between 'client' and 'owner' and returns the current value
+    public String changeViewState(Long userId){
+        String redisKey = VIEW_STATE_REDIS_KEY + userId;
+        Object currentState = redis.getKey(redisKey);
+        String key = CLIENT_VIEW;
+
+        if(currentState != null && currentState.toString().equals(key))
+            key = OWNER_VIEW;
+
+        redis.setKey(redisKey, key, 90, TimeUnit.DAYS);
+
+        return key;
     }
 
 }
