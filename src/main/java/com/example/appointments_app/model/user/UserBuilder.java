@@ -12,6 +12,7 @@ public final class UserBuilder {
     private String password;
     private String role;
     private Set<Business> businesses;
+    private boolean verified;
     private Set<Business> savedBusinesses;
 
     private UserBuilder() {
@@ -56,6 +57,11 @@ public final class UserBuilder {
         return this;
     }
 
+    public UserBuilder withVerified(boolean verified) {
+        this.verified = verified;
+        return this;
+    }
+
     public UserBuilder withSavedBusinesses(Set<Business> savedBusinesses) {
         this.savedBusinesses = savedBusinesses;
         return this;
@@ -70,6 +76,7 @@ public final class UserBuilder {
         user.setPassword(password);
         user.setRole(role);
         user.setBusinesses(businesses);
+        user.setVerified(verified);
         user.setSavedBusinesses(savedBusinesses);
         return user;
     }

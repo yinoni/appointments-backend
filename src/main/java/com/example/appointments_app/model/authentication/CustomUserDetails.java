@@ -12,15 +12,17 @@ public class CustomUserDetails implements UserDetails {
     private String email;
     private String password;
     private String phoneNumber;
+    private boolean verified;
     private Collection<? extends GrantedAuthority> authorities;
 
 
-    public CustomUserDetails(Long id, String email, String phoneNumber, String password, Collection<? extends GrantedAuthority> authorities) {
+    public CustomUserDetails(Long id, String email, String phoneNumber, String password, boolean verified, Collection<? extends GrantedAuthority> authorities) {
         this.email = email;
         this.password = password;
         this.id = id;
         this.authorities = authorities;
         this.phoneNumber = phoneNumber;
+        this.verified = verified;
     }
 
 
@@ -46,6 +48,14 @@ public class CustomUserDetails implements UserDetails {
 
     public String getPhoneNumber() {
         return phoneNumber;
+    }
+
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
     }
 
     // שאר המתודות של הממשק (חייב לממש את כולן)
