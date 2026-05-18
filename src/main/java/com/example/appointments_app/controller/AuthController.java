@@ -4,6 +4,7 @@ import com.example.appointments_app.jwt.JwtService;
 import com.example.appointments_app.model.authentication.AuthRequest;
 import com.example.appointments_app.model.authentication.CustomUserDetails;
 import com.example.appointments_app.model.authentication.PhoneVerifyInput;
+import com.example.appointments_app.model.user.SendOTPCodeRequest;
 import com.example.appointments_app.model.user.User;
 import com.example.appointments_app.model.user.UserIn;
 import com.example.appointments_app.service.UserService;
@@ -33,11 +34,6 @@ public class AuthController {
         this.authenticationManager = authenticationManager;
     }
 
-    @GetMapping("")
-    public ResponseEntity<?> temp(){
-        return ResponseEntity.ok("OK");
-    }
-
     @PostMapping("")
     public ResponseEntity<?> login(@RequestBody AuthRequest request){
 
@@ -64,7 +60,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserIn userIn){
         User userRes = userService.register(userIn);
-        CustomUserDetails userDetails = new CustomUserDetails(userRes.getId(), userRes.getEmail(), userRes.getPhoneNumber(), userRes.getPassword(), new ArrayList<>());
+        CustomUserDetails userDetails = new CustomUserDetails(userRes.getId(), userRes.getEmail(), userRes.getPhoneNumber(), userRes.getPassword(), false, new ArrayList<>());
 
         String token = jwtService.generateToken(userDetails);
 
@@ -72,8 +68,16 @@ public class AuthController {
     }
 
     @PostMapping("/phone-verify")
-    public ResponseEntity<?> phoneVerify(@RequestBody PhoneVerifyInput phoneVerifyInput){
-        userService.verifyPhoneNumber(phoneVerifyInput);
+    public ResponseEntity<?> phoneVerify(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody PhoneVerifyInput phoneVerifyInput){
+        userService.verifyPhoneNumber(customUserDetails.getPhoneNumber(), phoneVerifyInput.getCode());
+        customUserDetails.setVerified(true);
+        String token = jwtService.generateToken(customUserDetails);
+        return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<?> sendOTP(@AuthenticationPrincipal CustomUserDetails customUserDetails){
+        userService.resendOtpCode(customUserDetails.getPhoneNumber());
         return ResponseEntity.ok("OK");
     }
 

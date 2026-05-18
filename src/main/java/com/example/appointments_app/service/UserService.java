@@ -130,18 +130,17 @@ public class UserService implements UserDetailsService {
                 userEntity.getEmail(),
                 userEntity.getPhoneNumber(),
                 userEntity.getPassword(),
+                userEntity.isVerified(),
                 Collections.emptyList()
         );
     }
 
     /***
      *
-     * @param phoneVerifyInput - Contains the phone number and the 4-digit code that has been sent to this phone number
+     * @param phone - Contains the phone number and the 4-digit code that has been sent to this phone number
      * This function verify the phone number
      */
-    public void verifyPhoneNumber(PhoneVerifyInput phoneVerifyInput){
-        String phone = phoneVerifyInput.getPhoneNumber();
-        String code = phoneVerifyInput.getCode();
+    public void verifyPhoneNumber(String phone, String code){
         String otpCode = OTP_PREFIX + phone;
 
         int attempts = redis.incrementAndGetCounter(phone);
@@ -158,6 +157,9 @@ public class UserService implements UserDetailsService {
             throw new InvalidOTPException("Incorrect code! Attempts left: " + (5 - attempts));
 
         User user = findByPhone(phone);
+        user.setVerified(true);
+
+        saveUser(user);
 
         userProducer.phoneVerifiedEvent(new UserEventDTO(user.getFullName(), user.getEmail(), user.getPhoneNumber()));
         redis.deleteKey(otpCode);

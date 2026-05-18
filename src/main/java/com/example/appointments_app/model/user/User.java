@@ -29,6 +29,9 @@ public class User {
     @OneToMany(mappedBy = "owner")
     private Set<Business> businesses;
 
+    @Column(nullable = false)
+    private boolean verified;
+
     @ManyToMany
     @JoinTable(
             name = "user_favorites",
@@ -106,7 +109,13 @@ public class User {
         this.savedBusinesses = savedBusinesses;
     }
 
+    public boolean isVerified() {
+        return verified;
+    }
 
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
 
     public UserDTO convertToUserDTO(){
         UserDTO dto = new UserDTO();

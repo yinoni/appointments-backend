@@ -28,6 +28,7 @@ public class JwtService {
                 .setSubject(userDetails.getUsername())
                 .claim("roles", userDetails.getAuthorities())
                 .claim("id", userDetails.getId())
+                .claim("verified", userDetails.isVerified())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(secretKey)
@@ -46,6 +47,10 @@ public class JwtService {
 
     public Date extractDate(String token) {
         return extractClaim(token, Claims::getExpiration);
+    }
+
+    public boolean extractVerified(String token){
+        return extractClaim(token, claims -> claims.get("verified", Boolean.class));
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> resolver) {
