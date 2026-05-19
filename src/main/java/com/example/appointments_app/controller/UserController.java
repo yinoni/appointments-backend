@@ -6,6 +6,8 @@ import com.example.appointments_app.model.user.UserDTO;
 import com.example.appointments_app.model.user.UserUpdateRequest;
 import com.example.appointments_app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +30,17 @@ public class UserController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String token, @AuthenticationPrincipal CustomUserDetails customUserDetails){
         userService.logout(token, customUserDetails.getId());
-        return ResponseEntity.ok("Success");
+
+        ResponseCookie deleteCookie = ResponseCookie.from("refresh_token", null)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0) // זמן תוקף 0 אומר לדפדפן: תמחק אותה עכשיו!
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                .body("Logged out successfully");
     }
 
     @PutMapping("")

@@ -44,11 +44,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
         http
+                // הגדרת CORS מעודכנת ומאובטחת לבדיקות
                 .cors(cors -> cors.configurationSource(request -> {
-                    var corsConfiguration = new CorsConfiguration();
+                    CorsConfiguration corsConfiguration = new CorsConfiguration();
+
+                    // 1. חובה: להגדיר מאיפה מגיעה האפליקציה (ה-React Native Web שלך)
                     corsConfiguration.setAllowedOrigins(List.of("http://localhost:8081"));
+
+                    // 2. חובה: לאשר את כל המטודות, כולל OPTIONS שהדפדפן שולח לפני הבקשה האמיתית
                     corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+
                     corsConfiguration.setAllowedHeaders(List.of("*"));
+
+                    // 3. התיקון הקריטי! בלי זה השגיאה שקיבלת בדפדפן תמשיך להופיע
+                    corsConfiguration.setAllowCredentials(true);
+
                     return corsConfiguration;
                 }))
                 .csrf(csrf -> csrf.disable())
@@ -65,7 +75,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout.disable())
                 .oauth2Login(oauth -> oauth
-                        .successHandler(successHandler) // ה-Handler שבנינו קודם
+                        .successHandler(successHandler)
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
