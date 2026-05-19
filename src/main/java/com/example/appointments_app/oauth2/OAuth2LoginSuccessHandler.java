@@ -4,6 +4,7 @@ import com.example.appointments_app.jwt.JwtService;
 import com.example.appointments_app.model.authentication.CustomUserDetails;
 import com.example.appointments_app.model.user.User;
 import com.example.appointments_app.repo.UserRepository;
+import com.example.appointments_app.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     @Autowired
     @Lazy
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthService authService;
 
 
 
@@ -63,7 +67,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         CustomUserDetails userDetails = new CustomUserDetails(finalUser.getId(), finalUser.getEmail(), finalUser.getPhoneNumber(), finalUser.getPassword(), finalUser.isVerified(), Collections.emptyList());
 
-        String token = jwtService.generateToken(userDetails);
-        getRedirectStrategy().sendRedirect(request, response, "AppointMe-app://oauth-callback?token=" + token);
+        String accessToken = jwtService.generateAccessToken(userDetails);
+        String refreshToken = authService.generateRefreshToken(request.getHeader("User-Agent"), userDetails.getId());
+        getRedirectStrategy().sendRedirect(request, response, "AppointMe-app://oauth-callback?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
     }
 }

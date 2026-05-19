@@ -4,6 +4,7 @@ import com.example.appointments_app.exception.UserNotVerified;
 import com.example.appointments_app.redis.Redis;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.security.sasl.AuthenticationException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,6 +45,7 @@ public class JwtFilter extends OncePerRequestFilter {
         //Getting the Authorization header from the request
         String authHeader = request.getHeader("Authorization");
         String requestPath = request.getRequestURI();
+
 
         //Checking if the header value starts with 'Bearer'
         if (authHeader != null && authHeader.startsWith("Bearer ")) {

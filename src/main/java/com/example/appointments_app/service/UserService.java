@@ -238,4 +238,8 @@ public class UserService implements UserDetailsService {
         return key;
     }
 
+    public void generateNewRefreshToken(CustomUserDetails userDetails){
+        
+    }
+
 }

@@ -2,36 +2,36 @@ package com.example.appointments_app.jwt;
 
 import com.example.appointments_app.model.authentication.CustomUserDetails;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @Service
 public class JwtService {
 
-    private final SecretKey secretKey;
+    private final SecretKey accessSecretKey;
 
-    private static final long EXPIRATION =
-            1000 * 60 * 60; // שעה
+    private static final long ACCESS_EXPIRATION = TimeUnit.MINUTES.toMillis(60);
 
     public JwtService(SecretKey secretKey) {
-        this.secretKey = secretKey;
+        this.accessSecretKey = secretKey;
     }
 
-
-    public String generateToken(CustomUserDetails userDetails){
+    public String generateAccessToken(CustomUserDetails userDetails){
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("roles", userDetails.getAuthorities())
                 .claim("id", userDetails.getId())
                 .claim("verified", userDetails.isVerified())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(secretKey)
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXPIRATION))
+                .signWith(accessSecretKey)
                 .compact();
     }
 
@@ -42,11 +42,22 @@ public class JwtService {
 
 
     public boolean isTokenValid(String token, UserDetails user) {
-        return extractUsername(token).equals(user.getUsername());
+        return extractUsername(token).equals(user.getUsername()) && !isTokenExpired(token);
     }
 
     public Date extractDate(String token) {
         return extractClaim(token, Claims::getExpiration);
+    }
+
+    private boolean isTokenExpired(String token) {
+        try {
+            Date expiration = extractDate(token);
+            return expiration.before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     public boolean extractVerified(String token){
@@ -61,7 +72,7 @@ public class JwtService {
         }
 
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+                .setSigningKey(accessSecretKey)
                 .build()
                 .parseClaimsJws(cleanToken)
                 .getBody();
